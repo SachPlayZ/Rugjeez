@@ -1,0 +1,15 @@
+{
+  "chainId": 5042002,
+  "network": "arc-testnet",
+  "deployedAt": "2026-05-24",
+  "contracts": {
+    "MarketRegistry": "0xa1Db4fBe80E7064E8bC70b6138a11572cFE1f79b",
+    "TraceRegistry": "0x614A1F64395FD1b925E347AC13812CC48b62f5B7",
+    "USDC": "0x3600000000000000000000000000000000000000"
+  },
+  "roles": {
+    "deployer": "0xe34b40f38217f9Dc8c3534735f7f41B2cDA73A75",
+    "agent": "0xe34b40f38217f9Dc8c3534735f7f41B2cDA73A75",
+    "resolver": "0xe34b40f38217f9Dc8c3534735f7f41B2cDA73A75"
+  }
+}

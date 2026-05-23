@@ -307,7 +307,7 @@ Four planes:
 
 | # | Module | Status | Depends on |
 |---|--------|--------|------------|
-| 1 | `contracts/` — Solidity on Arc | `in_progress` | — |
+| 1 | `contracts/` — Solidity on Arc | `complete` | — |
 | 2 | `agent/` — Python agent + collectors | `not_started` | 1 |
 | 3 | `agent/demo` — manual signal injection endpoint | `not_started` | 2 |
 | 4 | `web/` — Next.js frontend | `not_started` | 1 (and 2 for live data) |
@@ -322,7 +322,7 @@ Four planes:
 
 # Module 1 — `contracts/`
 
-**Status:** `in_progress`
+**Status:** `complete`
 
 **Purpose.** On-chain market protocol. Three small contracts, all auditable in one sitting.
 
@@ -414,16 +414,21 @@ contracts/
 - ABIs exported to `agent/agent/abis/` and `web/src/lib/abis/`
 
 ### Handoff (filled when complete)
-*To be filled by Claude when module marked complete.*
 
-- `MarketRegistry` address:
-- `TraceRegistry` address:
-- Deployer / agent address:
-- Resolver address:
-- ABI export paths:
+- `MarketRegistry` address: `0xa1Db4fBe80E7064E8bC70b6138a11572cFE1f79b`
+- `TraceRegistry` address: `0x614A1F64395FD1b925E347AC13812CC48b62f5B7`
+- Deployer / agent address: `0xe34b40f38217f9Dc8c3534735f7f41B2cDA73A75`
+- Resolver address: `0xe34b40f38217f9Dc8c3534735f7f41B2cDA73A75` (same as agent for now)
+- ABI export paths: `agent/agent/abis/`, `web/src/lib/abis/`
+- Full deploy record: `infra/deployed.json`
 
 ### Notes (filled when complete)
-*To be filled by Claude when module marked complete.*
+
+- `via_ir = true` required in `foundry.toml` — `createMarket` has too many stack vars without it.
+- BinaryMarket does NOT pull USDC in constructor; MarketRegistry seeds it via `transfer` after deploy. This avoids the impossible pre-approve-unknown-address problem.
+- Agent + resolver are the same wallet for v1; can be split later via `setAgent`/`setResolver`.
+- `refund()` separate from `claim()` — only callable when `State.Cancelled`.
+- All 21 tests pass under `forge test`.
 
 ---
 
