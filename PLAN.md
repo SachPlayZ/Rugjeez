@@ -309,7 +309,7 @@ Four planes:
 |---|--------|--------|------------|
 | 1 | `contracts/` — Solidity on Arc | `complete` | — |
 | 2 | `agent/` — Python agent + collectors | `complete` | 1 |
-| 3 | `agent/demo` — manual signal injection endpoint | `in_progress` | 2 |
+| 3 | `agent/demo` — manual signal injection endpoint | `complete` | 2 |
 | 4 | `web/` — Next.js frontend | `not_started` | 1 (and 2 for live data) |
 | 5 | `web/demo` — demo trigger button UI | `not_started` | 3, 4 |
 | 6 | `bot/` — Twitter/Telegram poster | `not_started` | 1 |
@@ -578,7 +578,7 @@ agent/
 
 # Module 3 — `agent/demo` — manual signal injection
 
-**Status:** `in_progress` · **Depends on:** Module 2
+**Status:** `complete` · **Depends on:** Module 2
 
 **Purpose.** Demo button that fires a signal into the bus on demand, so the demo video doesn't depend on iterativv pushing a commit during recording. The button picks from a **list of real recent additions** to the NFI blacklist (pre-fetched) so the demo is authentic, not fake.
 
@@ -639,18 +639,26 @@ agent/agent/
 - The demo loader gracefully handles GitHub API rate limits (use ETag caching, store in `agent/agent/data/github_cache.json`)
 
 ### Cross-cutting checklist
-- [ ] Demo path includes `DEMO_API_SECRET` obscurity suffix (`/demo-<secret>/inject`)
-- [ ] In-memory rate limit: 10 mints per IP per hour
-- [ ] CORS allowlist restricted to the deployed frontend origin
-- [ ] GitHub fetches use ETags via `cache.py` + persistent ETag store in `github_cache.json`
-- [ ] Endpoint shares the agent's `signal_id` logging so demo injections are traceable in logs
+- [x] Demo path includes `DEMO_API_SECRET` obscurity suffix (`/demo-<secret>/inject`)
+- [x] In-memory rate limit: 10 mints per IP per hour
+- [x] CORS allowlist restricted to the deployed frontend origin
+- [x] GitHub fetches use ETags via `cache.py` + persistent ETag store in `github_cache.json`
+- [x] Endpoint shares the agent's `signal_id` logging so demo injections are traceable in logs
 
 ### Handoff (filled when complete)
-- Demo API port and path:
-- Demo candidates count at deploy:
+- Demo API port and path: `http://127.0.0.1:8787/demo-x9k2vp4z/candidates` + `.../inject`
+- Demo candidates count at deploy: 10 real NFI blacklist additions (CES, PHB, MLN, FARM, ATA, SKYAI, PSAI, BLUM, BSY, IZI)
+- GitHub cache: `agent/agent/data/github_cache.json` (ETag + per-SHA symbol cache)
+- Candidates cache: `agent/agent/data/demo_candidates.json`
+- CORS origin: set `CORS_ORIGIN` env var to frontend URL before deploy (defaults to `*` for dev)
 
 ### Notes (filled when complete)
-*To be filled by Claude when module marked complete.*
+- `demo_loader.py` fetches last 20 commits that touched `NFI_BLACKLIST_PATH`, diffs consecutive snapshots to find new symbols, maps to `symbol_map.json`. Results cached in `demo_candidates.json`.
+- ETag caching: commits list uses HTTP ETag (304 short-circuit). Per-SHA content cached forever in `github_cache.json` under `_symbol_cache` key (SHA-addressed URLs are immutable).
+- On 304, `commits_order` from cache is used so candidates can be recomputed if `symbol_map.json` changes without a new GitHub fetch.
+- Added 18 new BSC/Ethereum tokens to `symbol_map.json` matching recent NFI blacklist additions (IZI, PHB, MLN, UXLINK, SKYAI, CES, PSAI, YZY, RAIN, CORN, DAM, IAG, FARM, ATA, MONPRO, BSY, WAT + existing BLUM). Some placeholder addresses for newer tokens — price fetch falls back to $1 USD gracefully.
+- Rate limit uses `cachetools.TTLCache(ttl=3600)` per IP; sliding window (resets on last write). Acceptable for demo use.
+- `make_router(bus)` must be called from `main.py` after `bus` is created. Router is included once on startup.
 
 ---
 
