@@ -308,7 +308,7 @@ Four planes:
 | # | Module | Status | Depends on |
 |---|--------|--------|------------|
 | 1 | `contracts/` — Solidity on Arc | `complete` | — |
-| 2 | `agent/` — Python agent + collectors | `not_started` | 1 |
+| 2 | `agent/` — Python agent + collectors | `in_progress` | 1 |
 | 3 | `agent/demo` — manual signal injection endpoint | `not_started` | 2 |
 | 4 | `web/` — Next.js frontend | `not_started` | 1 (and 2 for live data) |
 | 5 | `web/demo` — demo trigger button UI | `not_started` | 3, 4 |
@@ -434,7 +434,7 @@ contracts/
 
 # Module 2 — `agent/`
 
-**Status:** `not_started` · **Depends on:** Module 1
+**Status:** `in_progress` · **Depends on:** Module 1
 
 **Purpose.** Continuously watch signal sources; on each new signal, decide whether to mint a market.
 
