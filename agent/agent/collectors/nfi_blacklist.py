@@ -19,10 +19,10 @@ log = get_logger(__name__)
 _POLL_INTERVAL = 60  # seconds
 _SYMBOL_MAP_PATH = Path(__file__).parent.parent / "data" / "symbol_map.json"
 
-# GitHub raw URL template
 _RAW_URL = "https://raw.githubusercontent.com/{repo}/{branch}/{path}"
 _NFI_REPO = os.getenv("NFI_REPO", "iterativv/NostalgiaForInfinity")
 _NFI_BRANCH = "main"
+_NFI_BLACKLIST_PATH = os.getenv("NFI_BLACKLIST_PATH", "configs/blacklist-binance.json")
 
 
 def _load_symbol_map() -> dict[str, dict]:
@@ -32,7 +32,7 @@ def _load_symbol_map() -> dict[str, dict]:
 
 
 @cached("github_blob")
-async def _fetch_blacklist(url: str) -> str:
+async def _fetch_raw(url: str) -> str:
     async with aiohttp.ClientSession() as session:
         async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
             resp.raise_for_status()
@@ -40,38 +40,47 @@ async def _fetch_blacklist(url: str) -> str:
 
 
 def _parse_blacklist(content: str) -> set[str]:
-    """Extract token symbols from NFI blacklist python file or plain text."""
+    """Extract token symbols from NFI FreqTrade-style JSON blacklist.
+
+    Entries look like: "(TOKENX|TOKENY|...)/.*"
+    Strip comments (// ...) before parsing JSON.
+    """
+    cleaned = re.sub(r"//[^\n]*", "", content)
+    try:
+        data = json.loads(cleaned)
+        pairs: list[str] = data.get("exchange", {}).get("pair_blacklist", [])
+    except Exception:
+        pairs = re.findall(r'"([^"]+)"', content)
+
     symbols: set[str] = set()
-
-    # Match quoted strings in blacklist arrays/sets
-    for match in re.finditer(r'["\']([A-Z0-9]{2,12})["\']', content):
-        sym = match.group(1)
-        if sym.isupper() and len(sym) >= 2:
-            symbols.add(sym)
-
+    for pattern in pairs:
+        # grab everything inside the leading (...)/
+        m = re.match(r"\(([^)]+)\)/", pattern)
+        if not m:
+            continue
+        for raw_sym in m.group(1).split("|"):
+            # skip regex tokens: .* [xxx] 1000.*
+            sym = raw_sym.strip()
+            if re.match(r"^[A-Z0-9]{2,20}$", sym):
+                symbols.add(sym)
     return symbols
 
 
 async def nfi_blacklist_collector(bus) -> AsyncGenerator[None, None]:
     symbol_map = _load_symbol_map()
-    blacklist_path = os.getenv("NFI_BLACKLIST_PATH", "")
-    if not blacklist_path:
-        log.warning("nfi_blacklist_path_not_set")
-        return
-
-    url = _RAW_URL.format(repo=_NFI_REPO, branch=_NFI_BRANCH, path=blacklist_path)
+    url = _RAW_URL.format(repo=_NFI_REPO, branch=_NFI_BRANCH, path=_NFI_BLACKLIST_PATH)
     known: set[str] = set()
     first_run = True
 
     while True:
         try:
-            content = await _fetch_blacklist(url)
+            content = await _fetch_raw(url)
             current = _parse_blacklist(content)
 
             if first_run:
                 known = current
                 first_run = False
-                log.info("nfi_baseline", count=len(known))
+                log.info("nfi_baseline", count=len(known), url=url)
             else:
                 new_symbols = current - known
                 for sym in new_symbols:
