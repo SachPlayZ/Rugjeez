@@ -1,0 +1,122 @@
+{
+  "PEPE": {
+    "token_id": "0x6982508145454Ce325dDbE47a25d4ec3d2311933",
+    "chain": "ethereum"
+  },
+  "SHIB": {
+    "token_id": "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE",
+    "chain": "ethereum"
+  },
+  "FLOKI": {
+    "token_id": "0xcf0C122c6b73ff809C693DB761e7BaeBe62b6a2E",
+    "chain": "ethereum"
+  },
+  "TURBO": {
+    "token_id": "0xA35923162C49cF95e6BF26623385eb431ad920D3",
+    "chain": "ethereum"
+  },
+  "MEME": {
+    "token_id": "0xb131f4A55907B10d1F0A50d8ab8FA09EC342cd74",
+    "chain": "ethereum"
+  },
+  "AIDOGE": {
+    "token_id": "0x7b32e70e8D73ac87c1B342e063528B2930b15cEB",
+    "chain": "ethereum"
+  },
+  "DOGE2": {
+    "token_id": "0x0c6d0C73086DB7b15Fc9A4b5C3D2d10B08cD81C4",
+    "chain": "bsc"
+  },
+  "BABYDOGE": {
+    "token_id": "0xc748673057861a797275CD8A068AbB95A902e8de",
+    "chain": "bsc"
+  },
+  "SAFEMOON": {
+    "token_id": "0x8076C74C5e3F5852037F31Ff0093Eeb8c8ADd8D3",
+    "chain": "bsc"
+  },
+  "ELONGATE": {
+    "token_id": "0x2A9718defF471f3Bb91FA0ECEAB14154F150a385",
+    "chain": "bsc"
+  },
+  "KISHU": {
+    "token_id": "0xA2b4C0Af19cC16a6CfAcCe81F192B024d625817D",
+    "chain": "ethereum"
+  },
+  "HOKK": {
+    "token_id": "0xc40AF1E4fEcFA05Ce6BAb79DcD8B373d2E436c4E",
+    "chain": "ethereum"
+  },
+  "ELON": {
+    "token_id": "0x761D38e5ddf6ccf6Cf7c55759d5210750B5D60F3",
+    "chain": "ethereum"
+  },
+  "SAMO": {
+    "token_id": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+    "chain": "solana"
+  },
+  "BONK": {
+    "token_id": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+    "chain": "solana"
+  },
+  "WIF": {
+    "token_id": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+    "chain": "solana"
+  },
+  "POPCAT": {
+    "token_id": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
+    "chain": "solana"
+  },
+  "MYRO": {
+    "token_id": "HhJpBhRRn4g56VsyLuT8DL5Bv31HkXqsrahTTUCZeZg4",
+    "chain": "solana"
+  },
+  "SLERF": {
+    "token_id": "7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3",
+    "chain": "solana"
+  },
+  "BOME": {
+    "token_id": "ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82",
+    "chain": "solana"
+  },
+  "BLUM": {
+    "token_id": "0x47f5b5e0Cd6A8C5cCE44694B3B9c0C40Acd0B9f3",
+    "chain": "bsc"
+  },
+  "PIXEL": {
+    "token_id": "0x3429d03c6F7521AeC737a0BBF2E5ddcef2C3Ae31",
+    "chain": "ethereum"
+  },
+  "LADYS": {
+    "token_id": "0x12BB890508c125661E03b09EC06E404bc9289040",
+    "chain": "ethereum"
+  },
+  "CULT": {
+    "token_id": "0xF0f9D895aCa5c8678f706FB8216fa22957685A13",
+    "chain": "ethereum"
+  },
+  "WOJAK": {
+    "token_id": "0x5026F006B85729a8b14553FAE6af249aD16c9aaB",
+    "chain": "ethereum"
+  },
+  "AIDOGECOIN": {
+    "token_id": "0x4F4A27b3f9a9C62F0E0C0A5Ed2B5f9ECd5c3B2A0",
+    "chain": "bsc"
+  },
+  "PSYOP": {
+    "token_id": "0x3007083EAA95497cD6B2b809fB97B6A30bdF53D3",
+    "chain": "ethereum"
+  },
+  "COPIUM": {
+    "token_id": "0xCB56b52316041A62B6b5D0583DcE4A8AE7a3C629",
+    "chain": "ethereum"
+  },
+  "CHAD": {
+    "token_id": "0x6aDB2E268de2aA1aBF6578E4a8119b960E02928F",
+    "chain": "ethereum"
+  },
+  "CUMMIES": {
+    "token_id": "0x27AEA1bB10d1A62476a96c0A56db8aE2A5Fe1C66",
+    "chain": "bsc"
+  }
+}
