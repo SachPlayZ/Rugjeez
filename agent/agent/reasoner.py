@@ -4,12 +4,14 @@ import hashlib
 import json
 import os
 
-import anthropic
+from groq import AsyncGroq
 
 from agent.logging import get_logger
 from agent.models import ReasonerOutput, Signal
 
 log = get_logger(__name__)
+
+_DEFAULT_MODEL = "qwen/qwen3-32b"
 
 _SYSTEM = """You are RugOracle's risk analyst. Given a set of signals about a token,
 decide whether to open a prediction market betting on whether the token will lose >50%
@@ -60,22 +62,27 @@ def trace_hash(trace: dict) -> str:
 
 
 async def reason(signals: list[Signal], score: float, signal_id: str) -> ReasonerOutput:
-    client = anthropic.AsyncAnthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    client = AsyncGroq(api_key=os.environ["GROQ_API_KEY"])
+    model = os.getenv("GROQ_MODEL", _DEFAULT_MODEL)
 
-    log.info("reasoning_start", signal_id=signal_id, score=score, n_signals=len(signals))
+    log.info("reasoning_start", signal_id=signal_id, score=score, n_signals=len(signals), model=model)
 
-    message = await client.messages.create(
-        model="claude-opus-4-7-20251101",
-        max_tokens=1024,
-        system=_SYSTEM,
-        messages=[{"role": "user", "content": _build_prompt(signals, score)}],
+    response = await client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": _SYSTEM},
+            {"role": "user", "content": _build_prompt(signals, score)},
+        ],
+        response_format={"type": "json_object"},
+        temperature=0.6,
+        max_completion_tokens=4096,
+        top_p=0.95,
+        reasoning_effort="default",
+        stream=False,
+        stop=None,
     )
 
-    raw = message.content[0].text.strip()
-    # strip markdown fences if present
-    if raw.startswith("```"):
-        raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
-
+    raw = response.choices[0].message.content.strip()
     parsed = json.loads(raw)
     parsed["signal_id"] = signal_id
 

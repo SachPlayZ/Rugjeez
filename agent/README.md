@@ -21,7 +21,7 @@ See `.env.example`. Required before running:
 | Var | Description |
 |-----|-------------|
 | `AGENT_PRIVATE_KEY` | Wallet key — must be funded with USDC on Arc Testnet |
-| `ANTHROPIC_API_KEY` | Claude API key for reasoning |
+| `GROQ_API_KEY` | Groq API key for reasoning (default model: `qwen/qwen3-32b`) |
 | `PINATA_JWT` | Pinata JWT for IPFS pinning |
 | `NFI_BLACKLIST_PATH` | Path within `iterativv/NostalgiaForInfinity` repo to blacklist file |
 
