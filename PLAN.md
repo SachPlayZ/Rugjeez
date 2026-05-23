@@ -308,7 +308,7 @@ Four planes:
 | # | Module | Status | Depends on |
 |---|--------|--------|------------|
 | 1 | `contracts/` — Solidity on Arc | `complete` | — |
-| 2 | `agent/` — Python agent + collectors | `in_progress` | 1 |
+| 2 | `agent/` — Python agent + collectors | `complete` | 1 |
 | 3 | `agent/demo` — manual signal injection endpoint | `not_started` | 2 |
 | 4 | `web/` — Next.js frontend | `not_started` | 1 (and 2 for live data) |
 | 5 | `web/demo` — demo trigger button UI | `not_started` | 3, 4 |
@@ -434,7 +434,7 @@ contracts/
 
 # Module 2 — `agent/`
 
-**Status:** `in_progress` · **Depends on:** Module 1
+**Status:** `complete` · **Depends on:** Module 1
 
 **Purpose.** Continuously watch signal sources; on each new signal, decide whether to mint a market.
 
@@ -552,22 +552,27 @@ agent/
 - Resolver successfully resolves an expired test market
 
 ### Cross-cutting checklist (must be true before marking complete)
-- [ ] `cache.py` exists; all DEX and GitHub calls in collectors use the `@cached` decorator
-- [ ] `state.py` SQLite schema created; executor wraps mints in state transitions
-- [ ] `nonce.py` NonceManager used on every chain tx; resync on nonce errors works
-- [ ] `chain.py` RPC calls wrapped with tenacity retry
-- [ ] `logging.py` structlog setup; every signal carries a `signal_id` through scoring → reasoning → execution
-- [ ] `GET /health` endpoint live on agent (separate from demo API or on same FastAPI app)
-- [ ] On restart with an in-flight mint row, agent reconciles correctly (test by killing mid-mint)
+- [x] `cache.py` exists; all DEX and GitHub calls in collectors use the `@cached` decorator
+- [x] `state.py` SQLite schema created; executor wraps mints in state transitions
+- [x] `nonce.py` NonceManager used on every chain tx; resync on nonce errors works
+- [x] `chain.py` RPC calls wrapped with tenacity retry
+- [x] `logging.py` structlog setup; every signal carries a `signal_id` through scoring → reasoning → execution
+- [x] `GET /health` endpoint live on agent (separate from demo API or on same FastAPI app)
+- [x] On restart with an in-flight mint row, agent reconciles correctly (test by killing mid-mint)
 
 ### Handoff (filled when complete)
-- Agent wallet address:
-- IPFS provider and base gateway:
-- Sample minted market address:
-- Health endpoint URL:
+- Agent wallet address: `0xe34b40f38217f9Dc8c3534735f7f41B2cDA73A75`
+- IPFS provider and base gateway: Pinata / `https://gateway.pinata.cloud/ipfs/`
+- Sample minted market address: `0x181A752Af947dE00529CFDE58324e8C2D0667552` (BLUME2E e2e test)
+- Health endpoint URL: `http://127.0.0.1:8787/health` (configurable via `DEMO_API_HOST`/`DEMO_API_PORT`)
 
 ### Notes (filled when complete)
-*To be filled by Claude when module marked complete.*
+- LLM swapped Anthropic → Groq (`qwen/qwen3-32b`). Set `GROQ_API_KEY` in `.env`.
+- NFI blacklist format is FreqTrade JSON (`configs/blacklist-*.json`), not a Python file. Parser strips JS-style `//` comments before JSON decode, then extracts symbols from `(SYM1|SYM2|...)/.*` patterns. Live: 395 symbols detected including BLUM.
+- `_fetch_raw` is cached with `@cached("github_blob")` (300s TTL). On high-frequency polls the same URL will be served from cache, which means diff detection fires only once per TTL window — acceptable for v1.
+- `executor.py` calls `approve` on USDC before `createMarket`. The registry pulls the 2 USDC seed via `transferFrom` internally.
+- Trace gateway warm-up (Pinata) occasionally fires a duplicate log line; benign.
+- `solana_lp.py` skipped (stretch goal). Price watchlist is in-process; tokens are added when any collector emits a signal for them.
 
 ---
 
