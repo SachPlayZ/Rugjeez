@@ -309,7 +309,7 @@ Four planes:
 |---|--------|--------|------------|
 | 1 | `contracts/` — Solidity on Arc | `complete` | — |
 | 2 | `agent/` — Python agent + collectors | `complete` | 1 |
-| 3 | `agent/demo` — manual signal injection endpoint | `not_started` | 2 |
+| 3 | `agent/demo` — manual signal injection endpoint | `in_progress` | 2 |
 | 4 | `web/` — Next.js frontend | `not_started` | 1 (and 2 for live data) |
 | 5 | `web/demo` — demo trigger button UI | `not_started` | 3, 4 |
 | 6 | `bot/` — Twitter/Telegram poster | `not_started` | 1 |
@@ -578,7 +578,7 @@ agent/
 
 # Module 3 — `agent/demo` — manual signal injection
 
-**Status:** `not_started` · **Depends on:** Module 2
+**Status:** `in_progress` · **Depends on:** Module 2
 
 **Purpose.** Demo button that fires a signal into the bus on demand, so the demo video doesn't depend on iterativv pushing a commit during recording. The button picks from a **list of real recent additions** to the NFI blacklist (pre-fetched) so the demo is authentic, not fake.
 

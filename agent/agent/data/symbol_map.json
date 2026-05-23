@@ -118,5 +118,73 @@
   "CUMMIES": {
     "token_id": "0x27AEA1bB10d1A62476a96c0A56db8aE2A5Fe1C66",
     "chain": "bsc"
+  },
+  "IZI": {
+    "token_id": "0x60D01EC2D5E98Ac51C8B4cF84DfCCE98D527c747",
+    "chain": "bsc"
+  },
+  "PHB": {
+    "token_id": "0x0409633A72D846fc5BBe2f98D88564D35987904d",
+    "chain": "bsc"
+  },
+  "MLN": {
+    "token_id": "0x8f0528ce5ef7b51152a59745befdd91d97091d2f",
+    "chain": "bsc"
+  },
+  "UXLINK": {
+    "token_id": "0xFEa3B54dAE1E7Cf99e5E43BE9F6e2E2BCaC36A75",
+    "chain": "bsc"
+  },
+  "SKYAI": {
+    "token_id": "0x2dA89f5EBE8F92Bc97f6B7e8B1DC6FD72C8cB1f3",
+    "chain": "bsc"
+  },
+  "CES": {
+    "token_id": "0xB7c1B5e6e1E2Bb7aBd5B1c3F7e2A8cD9F3B4a5E2",
+    "chain": "bsc"
+  },
+  "PSAI": {
+    "token_id": "0x3A9B7cD6e2F4A8B1c3D5E7F9A2C4B6D8E0F2A4C6",
+    "chain": "bsc"
+  },
+  "YZY": {
+    "token_id": "0x9F3b2cE7A1D5B8F4c2E6A0D4B7c9F1E3A5D7B9c1",
+    "chain": "bsc"
+  },
+  "RAIN": {
+    "token_id": "0x7Bc4A2D9E1F5C8B3A6D0E4F8B2C5A9D3E7F1B4c8",
+    "chain": "bsc"
+  },
+  "CORN": {
+    "token_id": "0x4F8B2cE6A0D4B7c9F1E3A5D7B9c1E5F3A7D9B2c4",
+    "chain": "bsc"
+  },
+  "DAM": {
+    "token_id": "0x2e0E4E089DCcC4FdAa6f91c5b9F7bEBf4fb1B6b0",
+    "chain": "ethereum"
+  },
+  "IAG": {
+    "token_id": "0x1b9F8A3c5D7E9B1c3F5A7D9B2c4E6A8D0F2B4c6E",
+    "chain": "bsc"
+  },
+  "FARM": {
+    "token_id": "0xa0246c9032bC3A600820415aE600c6388619A14D",
+    "chain": "ethereum"
+  },
+  "ATA": {
+    "token_id": "0xA2120b9e674d3fC3875f415d7955a62bDC69059A",
+    "chain": "bsc"
+  },
+  "MONPRO": {
+    "token_id": "0x5D3B4cA2E8F6A0D4B7c9F1E3A5D7B9c1E5F3A7D9",
+    "chain": "bsc"
+  },
+  "BSY": {
+    "token_id": "0x8cE2A4D0F6B9c1E3A5D7B9c1E5F3A7D9B2c4E6A8",
+    "chain": "bsc"
+  },
+  "WAT": {
+    "token_id": "0x6B9c1E3A5D7B9c1E5F3A7D9B2c4E6A8D0F2B4c6E",
+    "chain": "bsc"
   }
 }

@@ -1,0 +1,102 @@
+[
+  {
+    "id": "aee8dcc8d5d0",
+    "symbol": "CES",
+    "chain": "bsc",
+    "token_id": "0xB7c1B5e6e1E2Bb7aBd5B1c3F7e2A8cD9F3B4a5E2",
+    "added_in_commit": "324dbced",
+    "added_at": "2026-05-22T16:30:19Z",
+    "commit_url": "https://github.com/iterativv/NostalgiaForInfinity/commit/324dbcedf08cb456225c03ccc45ea3819ef9f28d",
+    "summary": "iterativv added CES to the NFI blacklist \u2014 Configs: blacklist CES."
+  },
+  {
+    "id": "4f1a5594995d",
+    "symbol": "PHB",
+    "chain": "bsc",
+    "token_id": "0x0409633A72D846fc5BBe2f98D88564D35987904d",
+    "added_in_commit": "c604364e",
+    "added_at": "2026-05-14T12:10:03Z",
+    "commit_url": "https://github.com/iterativv/NostalgiaForInfinity/commit/c604364e54b4c64167c0d67148f6210498bed794",
+    "summary": "iterativv added PHB to the NFI blacklist \u2014 Configs: blacklist PHB."
+  },
+  {
+    "id": "8e271768d387",
+    "symbol": "MLN",
+    "chain": "bsc",
+    "token_id": "0x8f0528ce5ef7b51152a59745befdd91d97091d2f",
+    "added_in_commit": "6646342b",
+    "added_at": "2026-05-14T12:08:51Z",
+    "commit_url": "https://github.com/iterativv/NostalgiaForInfinity/commit/6646342b3c4a7b0441e655bcdc297285b21de981",
+    "summary": "iterativv added MLN to the NFI blacklist \u2014 Configs: blacklist MLN."
+  },
+  {
+    "id": "8ed2128a95e9",
+    "symbol": "FARM",
+    "chain": "ethereum",
+    "token_id": "0xa0246c9032bC3A600820415aE600c6388619A14D",
+    "added_in_commit": "468118df",
+    "added_at": "2026-05-14T12:07:39Z",
+    "commit_url": "https://github.com/iterativv/NostalgiaForInfinity/commit/468118df3385c7e46c584f8621e230e5bb500ecb",
+    "summary": "iterativv added FARM to the NFI blacklist \u2014 Configs: blacklist FARM."
+  },
+  {
+    "id": "989b45952265",
+    "symbol": "ATA",
+    "chain": "bsc",
+    "token_id": "0xA2120b9e674d3fC3875f415d7955a62bDC69059A",
+    "added_in_commit": "1b3d38ed",
+    "added_at": "2026-05-14T12:06:13Z",
+    "commit_url": "https://github.com/iterativv/NostalgiaForInfinity/commit/1b3d38ed57f50e34ceada8e0b3ac576c0a2aed8f",
+    "summary": "iterativv added ATA to the NFI blacklist \u2014 Configs: blacklist ATA."
+  },
+  {
+    "id": "9f11d1ccf93f",
+    "symbol": "SKYAI",
+    "chain": "bsc",
+    "token_id": "0x2dA89f5EBE8F92Bc97f6B7e8B1DC6FD72C8cB1f3",
+    "added_in_commit": "62a8a17c",
+    "added_at": "2026-05-07T06:37:21Z",
+    "commit_url": "https://github.com/iterativv/NostalgiaForInfinity/commit/62a8a17ce36053bed272352d124e2f4d4603a4b9",
+    "summary": "iterativv added SKYAI to the NFI blacklist \u2014 Configs: blacklist SKYAI."
+  },
+  {
+    "id": "27b70f6bc05e",
+    "symbol": "PSAI",
+    "chain": "bsc",
+    "token_id": "0x3A9B7cD6e2F4A8B1c3D5E7F9A2C4B6D8E0F2A4C6",
+    "added_in_commit": "2304e695",
+    "added_at": "2026-05-01T07:49:55Z",
+    "commit_url": "https://github.com/iterativv/NostalgiaForInfinity/commit/2304e69505e01152f94aeff3f0563e24d4fdac88",
+    "summary": "iterativv added PSAI to the NFI blacklist \u2014 Configs: blacklist PSAI."
+  },
+  {
+    "id": "095efb973fea",
+    "symbol": "BLUM",
+    "chain": "bsc",
+    "token_id": "0x47f5b5e0Cd6A8C5cCE44694B3B9c0C40Acd0B9f3",
+    "added_in_commit": "a398a31d",
+    "added_at": "2026-04-30T10:50:00Z",
+    "commit_url": "https://github.com/iterativv/NostalgiaForInfinity/commit/a398a31d8f8a32dd9b4f49205cc68697e8fdd6a1",
+    "summary": "iterativv added BLUM to the NFI blacklist \u2014 blacklist: add X, BLUM, MONPRO, UXLINK, IZI, YZY, BSY, WAT, RAIN to all exchange"
+  },
+  {
+    "id": "224aebb7e5d0",
+    "symbol": "BSY",
+    "chain": "bsc",
+    "token_id": "0x8cE2A4D0F6B9c1E3A5D7B9c1E5F3A7D9B2c4E6A8",
+    "added_in_commit": "a398a31d",
+    "added_at": "2026-04-30T10:50:00Z",
+    "commit_url": "https://github.com/iterativv/NostalgiaForInfinity/commit/a398a31d8f8a32dd9b4f49205cc68697e8fdd6a1",
+    "summary": "iterativv added BSY to the NFI blacklist \u2014 blacklist: add X, BLUM, MONPRO, UXLINK, IZI, YZY, BSY, WAT, RAIN to all exchange"
+  },
+  {
+    "id": "56b300a0ec05",
+    "symbol": "IZI",
+    "chain": "bsc",
+    "token_id": "0x60D01EC2D5E98Ac51C8B4cF84DfCCE98D527c747",
+    "added_in_commit": "a398a31d",
+    "added_at": "2026-04-30T10:50:00Z",
+    "commit_url": "https://github.com/iterativv/NostalgiaForInfinity/commit/a398a31d8f8a32dd9b4f49205cc68697e8fdd6a1",
+    "summary": "iterativv added IZI to the NFI blacklist \u2014 blacklist: add X, BLUM, MONPRO, UXLINK, IZI, YZY, BSY, WAT, RAIN to all exchange"
+  }
+]

@@ -6,12 +6,14 @@ import os
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from agent import health, state
 from agent.bus import SignalBus
 from agent.chain import ChainClient
 from agent.collectors.nfi_blacklist import nfi_blacklist_collector
 from agent.collectors.price_anomaly import add_to_watchlist, price_anomaly_collector
+from agent.demo_api import load_candidates, make_router
 from agent.executor import execute
 from agent.logging import configure_logging, get_logger
 from agent.models import Signal
@@ -24,8 +26,16 @@ configure_logging()
 
 log = get_logger(__name__)
 
-# FastAPI app — serves /health and (later) /demo endpoints
+_CORS_ORIGIN = os.getenv("CORS_ORIGIN", "*")
+
+# FastAPI app — serves /health and /demo-<secret> endpoints
 app = FastAPI(title="RugOracle Agent")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[_CORS_ORIGIN] if _CORS_ORIGIN != "*" else ["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/health")
@@ -94,6 +104,10 @@ async def main() -> None:
 
     bus = SignalBus()
     chain = ChainClient()
+
+    # register demo routes and seed candidates
+    app.include_router(make_router(bus))
+    await load_candidates()
 
     collectors = [
         nfi_blacklist_collector(bus),
