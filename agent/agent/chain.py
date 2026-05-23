@@ -41,7 +41,7 @@ class ChainClient:
 
         self.usdc = self.w3.eth.contract(
             address=self.w3.to_checksum_address(usdc_addr),
-            abi=_load_abi("BinaryMarket"),  # USDC is ERC-20; reuse minimal ABI
+            abi=_load_abi("ERC20"),
         )
         self.market_registry = self.w3.eth.contract(
             address=self.w3.to_checksum_address(registry_addr),
