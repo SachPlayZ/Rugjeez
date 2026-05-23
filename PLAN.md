@@ -310,7 +310,7 @@ Four planes:
 | 1 | `contracts/` — Solidity on Arc | `complete` | — |
 | 2 | `agent/` — Python agent + collectors | `complete` | 1 |
 | 3 | `agent/demo` — manual signal injection endpoint | `complete` | 2 |
-| 4 | `web/` — Next.js frontend | `not_started` | 1 (and 2 for live data) |
+| 4 | `web/` — Next.js frontend | `in_progress` | 1 (and 2 for live data) |
 | 5 | `web/demo` — demo trigger button UI | `not_started` | 3, 4 |
 | 6 | `bot/` — Twitter/Telegram poster | `not_started` | 1 |
 | 7 | `infra/` — deploy + run scripts | `not_started` | all |
@@ -664,7 +664,7 @@ agent/agent/
 
 # Module 4 — `web/` — Next.js frontend
 
-**Status:** `not_started` · **Depends on:** Module 1 (and Module 2 for live data)
+**Status:** `in_progress` · **Depends on:** Module 1 (and Module 2 for live data)
 
 **Purpose.** Where users see markets, place bets, view reasoning. The traction surface.
 
