@@ -49,7 +49,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const account = privateKeyToAccount(privateKey as `0x${string}`);
+    const normalizedKey = (privateKey.startsWith("0x") ? privateKey : `0x${privateKey}`) as `0x${string}`;
+    const account = privateKeyToAccount(normalizedKey);
     const walletClient = createWalletClient({
       account,
       chain: arcTestnet,
