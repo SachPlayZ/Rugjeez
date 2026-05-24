@@ -348,7 +348,7 @@ export function WalletConnectButton({ className }: WalletConnectButtonProps) {
     return (
       <div className={cn("flex items-center gap-2", className)}>
         {balance !== null && (
-          <span className="text-xs font-mono text-muted-foreground tabular-nums">
+          <span className="hidden sm:inline text-xs font-mono text-muted-foreground tabular-nums">
             {formatUsdc(balance)} USDC
           </span>
         )}

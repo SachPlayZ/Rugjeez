@@ -189,6 +189,31 @@
 }
 @media (max-width: 640px) { [data-page="landing"] .rj-wrap { padding: 0 20px; } }
 
+/* ── Mobile hero / fold fixes ──────────────────────────────── */
+@media (max-width: 640px) {
+  /* Let fold grow taller than viewport instead of clipping content */
+  [data-page="landing"] .rj-fold {
+    height: auto;
+    min-height: calc(100dvh - var(--rj-ticker-h, 37px));
+  }
+  /* Hero: align top so content isn't hidden behind flex centering */
+  [data-page="landing"] .rj-hero {
+    align-items: flex-start;
+    padding: 16px 0 32px;
+  }
+  /* Smaller h1 so it doesn't wrap to 6+ lines on 375px */
+  [data-page="landing"] .rj-h1 {
+    font-size: clamp(32px, 9vw, 44px);
+    margin: 10px 0 14px;
+  }
+  /* Tighter CTA row — hint text drops to its own line */
+  [data-page="landing"] .rj-hero__cta {
+    gap: 8px;
+  }
+  /* Hide balance in landing nav — brand + address + disconnect fits; balance doesn't */
+  [data-page="landing"] .rj-nav__balance { display: none; }
+}
+
 /* ── Ticker ─────────────────────────────────────────────── */
 .rj-ticker {
   background: var(--rj-ink); color: var(--rj-mint);

@@ -14,6 +14,7 @@ import {
   Copy,
   Check,
   Loader2,
+  Send,
 } from "lucide-react";
 import {
   Tooltip,
@@ -94,7 +95,7 @@ function LandingWalletButton() {
     return (
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         {balance !== null && (
-          <span style={{ fontSize: 12, fontFamily: "var(--rj-mono)", color: "var(--rj-mint)", letterSpacing: "0.04em" }}>
+          <span className="rj-nav__balance" style={{ fontSize: 12, fontFamily: "var(--rj-mono)", color: "var(--rj-mint)", letterSpacing: "0.04em" }}>
             {formatUsdc(balance)} USDC
           </span>
         )}
@@ -226,8 +227,30 @@ export function LandingNav() {
         ))}
       </div>
 
-      {/* Right: wallet */}
-      <LandingWalletButton />
+      {/* Right: Telegram + wallet */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <a
+                href="https://t.me/+xdtrIy0WKv4yOWM1"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  width: 32, height: 32, borderRadius: 8,
+                  border: "1px solid var(--rj-line2)", color: "var(--rj-mint)",
+                  transition: "color 0.15s, border-color 0.15s",
+                }}
+              />
+            }
+          >
+            <Send size={14} />
+          </TooltipTrigger>
+          <TooltipContent>Join us on Telegram</TooltipContent>
+        </Tooltip>
+        <LandingWalletButton />
+      </div>
     </nav>
   );
 }

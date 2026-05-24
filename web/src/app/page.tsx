@@ -415,6 +415,7 @@ export default function LandingPage() {
               <a href="https://testnet.arcscan.app" target="_blank" rel="noopener">Arc explorer ↗</a>
               <a href="#signals">Methodology ↗</a>
               <a href="/demo">Agent demo ↗</a>
+              <a href="https://t.me/+xdtrIy0WKv4yOWM1" target="_blank" rel="noopener">Telegram community ↗</a>
             </div>
             <div className="rj-foot__col">
               <h5>On-chain</h5>
