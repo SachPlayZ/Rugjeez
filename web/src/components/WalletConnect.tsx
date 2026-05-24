@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, createContext, useContext } from "react";
+import { useState, useEffect, useCallback, createContext, useContext } from "react";
 import type { SmartAccount, P256Credential } from "viem/account-abstraction";
 import {
   loadCredential,
@@ -23,8 +23,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { Fingerprint, LogOut, Copy, Check, Loader2 } from "lucide-react";
+import { Fingerprint, LogOut, Copy, Check, Loader2, Coins } from "lucide-react";
 import { toast } from "sonner";
+import { explorerTx } from "@/lib/arc";
 
 interface WalletContextValue {
   account: SmartAccount | null;
@@ -233,6 +234,99 @@ function AddressCopy({ address }: { address: string }) {
   );
 }
 
+const FAUCET_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+const faucetCooldownKey = (address: string) => `rugjeez:faucet:${address.toLowerCase()}`;
+
+function useFaucetCooldown(address: string | null) {
+  const [expiresAt, setExpiresAt] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!address) { setExpiresAt(null); return; }
+    const raw = localStorage.getItem(faucetCooldownKey(address));
+    setExpiresAt(raw ? Number(raw) : null);
+  }, [address]);
+
+  const setCooldown = useCallback((address: string) => {
+    const exp = Date.now() + FAUCET_COOLDOWN_MS;
+    localStorage.setItem(faucetCooldownKey(address), String(exp));
+    setExpiresAt(exp);
+  }, []);
+
+  const remaining = expiresAt !== null ? Math.max(0, expiresAt - Date.now()) : 0;
+  const onCooldown = remaining > 0;
+
+  return { onCooldown, remaining, setCooldown };
+}
+
+function formatCooldown(ms: number): string {
+  const h = Math.floor(ms / 3_600_000);
+  const m = Math.floor((ms % 3_600_000) / 60_000);
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+function FundButton({ address }: { address: string }) {
+  const [loading, setLoading] = useState(false);
+  const { onCooldown, remaining, setCooldown } = useFaucetCooldown(address);
+
+  async function handleFund() {
+    if (onCooldown || loading) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/faucet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (res.status === 429 && data.remaining) {
+          setCooldown(address);
+          toast.error("Already funded", { description: `Try again in ${formatCooldown(data.remaining)}` });
+        } else {
+          toast.error("Faucet failed", { description: data.error ?? "Unknown error" });
+        }
+        return;
+      }
+      setCooldown(address);
+      toast.success("2 USDC sent!", {
+        description: data.hash ? (
+          <a href={explorerTx(data.hash)} target="_blank" rel="noopener noreferrer" className="underline">
+            View transaction
+          </a>
+        ) : undefined,
+      });
+    } catch {
+      toast.error("Faucet request failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={handleFund}
+      disabled={onCooldown || loading}
+      className="h-7 px-2 gap-1.5 text-xs"
+      title={onCooldown ? `Next faucet in ${formatCooldown(remaining)}` : "Get 2 USDC testnet funds"}
+      style={
+        onCooldown
+          ? { opacity: 0.5, cursor: "not-allowed" }
+          : { borderColor: "rgba(243,195,216,0.3)", color: "var(--primary)" }
+      }
+    >
+      {loading ? (
+        <Loader2 className="size-3 animate-spin" />
+      ) : (
+        <Coins className="size-3" />
+      )}
+      {onCooldown ? formatCooldown(remaining) : "Fund"}
+    </Button>
+  );
+}
+
 interface WalletConnectButtonProps {
   className?: string;
 }
@@ -259,6 +353,7 @@ export function WalletConnectButton({ className }: WalletConnectButtonProps) {
           </span>
         )}
         <AddressCopy address={address} />
+        <FundButton address={address} />
         <Button
           variant="ghost"
           size="sm"
