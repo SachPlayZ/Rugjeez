@@ -1,65 +1,178 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useEffect, useRef } from "react";
+import { Navbar } from "@/components/Navbar";
+import { StatusFooter } from "@/components/StatusFooter";
+import { MarketCard, MarketCardSkeleton } from "@/components/MarketCard";
+import { WalletProvider } from "@/components/WalletConnect";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  getAllMarketEvents,
+  watchNewMarkets,
+  type MarketCreatedEvent,
+} from "@/lib/markets";
+import { Activity, Zap } from "lucide-react";
+import { toast } from "sonner";
+
+export default function HomePage() {
+  const [markets, setMarkets] = useState<MarketCreatedEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const unwatchRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    getAllMarketEvents()
+      .then((events) => {
+        if (cancelled) return;
+        setMarkets(events.slice().reverse());
+        setLoading(false);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : "Failed to load markets");
+        setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+
+    let retryDelay = 1000;
+    let retryTimeout: ReturnType<typeof setTimeout>;
+
+    function subscribe() {
+      try {
+        const unwatch = watchNewMarkets((event) => {
+          retryDelay = 1000;
+          setMarkets((prev) => {
+            if (prev.some((m) => m.market === event.market)) return prev;
+            toast("New market opened", {
+              description: `$${event.tokenSymbol} on ${event.tokenChain.toUpperCase()}`,
+            });
+            return [event, ...prev];
+          });
+        });
+        unwatchRef.current = unwatch;
+      } catch {
+        retryTimeout = setTimeout(() => {
+          retryDelay = Math.min(retryDelay * 2, 60_000);
+          subscribe();
+        }, retryDelay);
+      }
+    }
+
+    subscribe();
+
+    return () => {
+      clearTimeout(retryTimeout);
+      unwatchRef.current?.();
+    };
+  }, [loading]);
+
+  const now = Math.floor(Date.now() / 1000);
+  const openMarkets = markets.filter((m) => now < Number(m.resolvesAt));
+  const closedMarkets = markets.filter((m) => now >= Number(m.resolvesAt));
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <WalletProvider>
+      <div className="flex flex-col min-h-dvh">
+        <Navbar />
+        <main className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 py-8">
+          {/* Hero */}
+          <div className="mb-10">
+            <div className="flex items-center gap-2 mb-3">
+              <Badge
+                variant="outline"
+                className="gap-1.5 text-xs border-primary/30 text-primary"
+              >
+                <span className="size-1.5 rounded-full bg-primary animate-pulse" />
+                Live on Arc Testnet
+              </Badge>
+            </div>
+            <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-tight mb-2">
+              AI Rug Detection Markets
+            </h1>
+            <p className="text-muted-foreground text-base max-w-xl leading-relaxed">
+              Autonomous AI agent mints binary prediction markets when multi-signal rug
+              detection crosses threshold. Bet in USDC with sponsored gas.
+            </p>
+          </div>
+
+          {error && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* Open markets */}
+          <section className="mb-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Activity className="size-4 text-primary" />
+                <h2 className="font-heading text-base font-semibold">
+                  Open Markets
+                </h2>
+                {!loading && (
+                  <Badge variant="secondary" className="font-mono text-xs">
+                    {openMarkets.length}
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <MarketCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : openMarkets.length === 0 ? (
+              <div className="flex flex-col items-center gap-3 py-16 text-center">
+                <Zap className="size-10 text-muted-foreground/40" />
+                <div>
+                  <p className="text-sm font-medium">No open markets yet</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    The agent is watching. Markets appear within seconds of a rug signal.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {openMarkets.map((m) => (
+                  <MarketCard key={m.market} event={m} state={0} />
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* Recently closed */}
+          {!loading && closedMarkets.length > 0 && (
+            <section>
+              <div className="flex items-center gap-2 mb-4">
+                <h2 className="font-heading text-base font-semibold text-muted-foreground">
+                  Recently Closed
+                </h2>
+                <Badge variant="secondary" className="font-mono text-xs">
+                  {closedMarkets.length}
+                </Badge>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {closedMarkets.slice(0, 6).map((m) => (
+                  <MarketCard key={m.market} event={m} state={1} />
+                ))}
+              </div>
+            </section>
+          )}
+        </main>
+        <StatusFooter />
+      </div>
+    </WalletProvider>
   );
 }

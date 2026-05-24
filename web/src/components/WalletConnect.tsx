@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect, createContext, useContext } from "react";
-import type { SmartAccount } from "viem/account-abstraction";
-import type { P256Credential } from "@circle-fin/modular-wallets-core";
+import type { SmartAccount, P256Credential } from "viem/account-abstraction";
 import {
   loadCredential,
   saveCredential,
@@ -219,7 +218,7 @@ function AddressCopy({ address }: { address: string }) {
   return (
     <button
       onClick={copy}
-      className="flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+      className="flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
       title="Copy address"
     >
       {address.slice(0, 6)}...{address.slice(-4)}

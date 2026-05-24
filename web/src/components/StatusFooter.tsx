@@ -29,7 +29,7 @@ function Dot({
 }) {
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
+      <TooltipTrigger>
         <div className="flex items-center gap-1.5 cursor-default">
           <div
             className={cn(

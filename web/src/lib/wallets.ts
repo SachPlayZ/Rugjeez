@@ -6,12 +6,12 @@ import {
   toWebAuthnCredential,
   toCircleSmartAccount,
   WebAuthnMode,
-  type P256Credential,
 } from "@circle-fin/modular-wallets-core";
 import {
   toWebAuthnAccount,
   createBundlerClient,
   type SmartAccount,
+  type P256Credential,
 } from "viem/account-abstraction";
 import { createPublicClient } from "viem";
 import { arcTestnet } from "./arc";

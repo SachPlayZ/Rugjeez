@@ -117,10 +117,12 @@ export function TraceViewer({
           {trace.manual_demo && (
             <Tooltip>
               <TooltipTrigger>
-                <Badge variant="secondary" className="gap-1 text-xs">
-                  <FlaskConical className="size-3" />
-                  Demo
-                </Badge>
+                <span>
+                  <Badge variant="secondary" className="gap-1 text-xs">
+                    <FlaskConical className="size-3" />
+                    Demo
+                  </Badge>
+                </span>
               </TooltipTrigger>
               <TooltipContent>
                 Demo-injected signal. Real NFI blacklist data, manually triggered.

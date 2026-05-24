@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RugOracle — Frontend
 
-## Getting Started
+Next.js 14 App Router frontend for RugOracle, the autonomous AI prediction market agent on Arc Testnet.
 
-First, run the development server:
+## Stack
+
+- **Next.js 14** App Router, TypeScript strict
+- **Tailwind CSS v4** + **shadcn/ui** (base-ui components)
+- **viem v2** — all on-chain reads (no ethers)
+- **Circle Modular Wallets** — passkey smart accounts, gasless bets
+- **Fonts**: Instrument Sans (headings) + Geist Sans (body) + Geist Mono (code)
+
+## Pages
+
+| Route | Description |
+|-------|-------------|
+| `/` | Live market feed — real-time via WSS |
+| `/m/[address]` | Market detail, trace viewer, bet UI |
+| `/agent` | Agent profile, signal sources, contracts |
+| `/history` | Resolved markets |
+| `/demo` | Manual signal injection console (Module 5) |
+
+## Setup
 
 ```bash
+cp .env.local.example .env.local
+# fill in your values
+
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+See `.env.local.example` for all required vars. Key ones:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+NEXT_PUBLIC_MARKET_REGISTRY_ADDRESS=0xa1Db4fBe80E7064E8bC70b6138a11572cFE1f79b
+NEXT_PUBLIC_TRACE_REGISTRY_ADDRESS=0x614A1F64395FD1b925E347AC13812CC48b62f5B7
+NEXT_PUBLIC_CIRCLE_CLIENT_KEY=          # from Circle Console
+NEXT_PUBLIC_CIRCLE_CLIENT_URL=          # from Circle Console
+NEXT_PUBLIC_AGENT_DEMO_URL=http://localhost:8787
+```
 
-## Learn More
+## Architecture Notes
 
-To learn more about Next.js, take a look at the following resources:
+- All on-chain reads use `getLogs` in 1000-block chunks (historical) + `watchEvent` (live)
+- Historical events cached in `sessionStorage` keyed by latest block number
+- WSS subscription wrapped in reconnect loop with exponential backoff (1s → 60s)
+- BetSheet uses optimistic UI: pending position shown immediately, flips on Arc confirmation (~1s)
+- Circle Modular Wallets: passkey register/login → smart account → gasless `sendUserOperation`
+- React error boundaries wrap `MarketCard`, `TraceViewer`, `BetSheet`
+- Mobile-first responsive, tested at 375px
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deploy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run build          # verify
+vercel deploy          # deploy to Vercel
+```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Set all `NEXT_PUBLIC_*` env vars in Vercel dashboard.

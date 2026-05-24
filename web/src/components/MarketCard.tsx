@@ -129,7 +129,7 @@ export function MarketCard({
           <OddsDisplay yesPool={yesPool} noPool={noPool} size="sm" />
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <Tooltip>
-              <TooltipTrigger asChild>
+              <TooltipTrigger>
                 <span className="tabular-nums cursor-help">
                   Pool: {formatUsdc(totalPool)} USDC
                 </span>

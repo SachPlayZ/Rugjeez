@@ -78,9 +78,10 @@ function setCachedMarkets(block: bigint, markets: MarketCreatedEvent[]) {
   }
 }
 
-function deserializeMarket(m: Record<string, unknown>): MarketCreatedEvent {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function deserializeMarket(m: any): MarketCreatedEvent {
   return {
-    ...(m as MarketCreatedEvent),
+    ...(m as unknown as MarketCreatedEvent),
     baselinePrice: BigInt(m.baselinePrice as string),
     thresholdBps: BigInt(m.thresholdBps as string),
     resolvesAt: BigInt(m.resolvesAt as string),
