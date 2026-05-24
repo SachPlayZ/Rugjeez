@@ -313,7 +313,7 @@ Four planes:
 | 4 | `web/` — Next.js frontend | `complete` | 1 (and 2 for live data) |
 | 5 | `web/demo` — demo trigger button UI | `complete` | 3, 4 |
 | 6 | `bot/` — Twitter/Telegram poster | `complete` | 1 |
-| 7 | `infra/` — deploy + run scripts | `in_progress` | all |
+| 7 | `infra/` — deploy + run scripts | `complete` | all |
 | 8 | `submission` — video, README, form | `not_started` | all |
 
 **Status values:** `not_started` | `in_progress` | `complete` | `blocked` | `skipped`
@@ -910,7 +910,7 @@ bot/
 
 # Module 7 — `infra/` — deploy + run scripts
 
-**Status:** `in_progress` · **Depends on:** all
+**Status:** `complete` · **Depends on:** all
 
 **Purpose.** One-shot deploy and run for the demo.
 
@@ -953,8 +953,22 @@ infra/
 - `make abis` after every contract change updates both ABI directories
 - `make status` clearly reports each service's health
 
+### Handoff (filled when complete)
+
+- Run from infra/: `make <target>` or from repo root: `make -f infra/Makefile <target>`
+- `deployed.json` is canonical — all env files read from it via `export-addresses`
+- `make abis` must be re-run after any `forge build`; ABIs stored as `{"abi": [...]}` to match agent `_load_abi()` and web `.abi` imports
+- `make status` exits 0 = all green, 1 = any service down/degraded
+- Bot health on port 8788 (not 8787); set `BOT_HEALTH_PORT` env var to override
+- `seed-demo` default count = 3; agent must be running first
+
 ### Notes (filled when complete)
-*To be filled by Claude when module marked complete.*
+
+- ABI export format was `{"abi": [...]}` not bare array — both `agent/chain.py` (`json["abi"]`) and `web/contracts.ts` (`.abi`) expect the key wrapper.
+- `make status` uses `|| true` on curl to prevent `set -e` from aborting on connection refused (exit code 7); bare `||` would double-print the HTTP code.
+- `deploy_contracts.sh` parses `console2.log` output from forge — relies on exact format `"MarketRegistry: <addr>"`. If forge output changes, grep pattern needs updating.
+- `seed-demo` reads `DEMO_API_SECRET` from `agent/.env` to construct the obscured URL; agent must be running before calling.
+- `db-reset` removes `agent/agent_state.db` from the repo root, not from infra/; path is relative to repo root.
 
 ---
 
