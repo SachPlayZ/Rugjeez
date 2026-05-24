@@ -26,11 +26,13 @@ export const arcTestnet = defineChain({
 });
 
 function makePublicClient() {
-  const rpcUrl =
-    process.env.NEXT_PUBLIC_ARC_RPC_URL ?? "https://rpc.testnet.arc.network";
+  // Use the local API proxy to avoid CORS issues with the Arc RPC in the browser.
+  // Falls back to the direct RPC URL for server-side rendering.
+  const proxyUrl =
+    typeof window !== "undefined" ? "/api/rpc" : (process.env.NEXT_PUBLIC_ARC_RPC_URL ?? "https://rpc.testnet.arc.network");
   return createPublicClient({
     chain: arcTestnet,
-    transport: fallback([http(rpcUrl), http("https://rpc.testnet.arc.network")], {
+    transport: fallback([http(proxyUrl), http("https://rpc.testnet.arc.network")], {
       retryCount: 3,
       retryDelay: 1000,
     }),
@@ -49,7 +51,8 @@ function makeWssClient() {
 export const publicClient = makePublicClient();
 export const wssClient = makeWssClient();
 
-export const DEPLOY_BLOCK = 1n;
+// Block at which MarketRegistry was deployed on Arc Testnet (0x29b1c19).
+export const DEPLOY_BLOCK = 43719705n;
 export const EXPLORER_URL =
   process.env.NEXT_PUBLIC_EXPLORER_URL ?? "https://testnet.arcscan.app";
 

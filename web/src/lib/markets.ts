@@ -108,13 +108,17 @@ export async function getAllMarketEvents(): Promise<MarketCreatedEvent[]> {
   }
 
   const CHUNK = 1000n;
-  const chunks: Promise<typeof accumulated>[] = [];
+  const CONCURRENCY = 5;
+  const ranges: Array<{ from: bigint; to: bigint }> = [];
 
   for (let from = fromBlock; from <= latest; from += CHUNK) {
     const to = from + CHUNK - 1n > latest ? latest : from + CHUNK - 1n;
-    chunks.push(
-      publicClient
-        .getLogs({
+    ranges.push({ from, to });
+  }
+
+  async function fetchRange(from: bigint, to: bigint) {
+    return publicClient
+      .getLogs({
           address: MARKET_REGISTRY_ADDRESS,
           event: {
             type: "event",
@@ -150,11 +154,17 @@ export async function getAllMarketEvents(): Promise<MarketCreatedEvent[]> {
             blockNumber: log.blockNumber ?? 0n,
             transactionHash: log.transactionHash as `0x${string}`,
           }))
-        )
-    );
+        );
   }
 
-  const results = (await Promise.all(chunks)).flat();
+  // Process in batches to avoid hammering the RPC with hundreds of concurrent calls.
+  const results: MarketCreatedEvent[] = [];
+  for (let i = 0; i < ranges.length; i += CONCURRENCY) {
+    const batch = ranges.slice(i, i + CONCURRENCY);
+    const batchResults = await Promise.all(batch.map((r) => fetchRange(r.from, r.to)));
+    results.push(...batchResults.flat());
+  }
+
   accumulated = [...accumulated, ...results];
   setCachedMarkets(latest, accumulated);
   return accumulated;
@@ -244,6 +254,43 @@ export function timeUntil(unixSeconds: bigint): string {
   if (d > 0) return `${d}d ${h}h`;
   if (h > 0) return `${h}h ${m}m`;
   return `${m}m`;
+}
+
+const POOLS_ABI = [
+  {
+    type: "function",
+    name: "yesPool",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "noPool",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+  },
+] as const;
+
+export async function getLivePools(
+  addresses: `0x${string}`[]
+): Promise<Map<`0x${string}`, { yesPool: bigint; noPool: bigint }>> {
+  const result = new Map<`0x${string}`, { yesPool: bigint; noPool: bigint }>();
+  if (addresses.length === 0) return result;
+
+  const pairs = await Promise.all(
+    addresses.map(async (addr) => {
+      const [yes, no] = await Promise.all([
+        publicClient.readContract({ address: addr, abi: POOLS_ABI, functionName: "yesPool" }),
+        publicClient.readContract({ address: addr, abi: POOLS_ABI, functionName: "noPool" }),
+      ]);
+      return [addr, { yesPool: yes as bigint, noPool: no as bigint }] as const;
+    })
+  );
+
+  for (const [addr, pools] of pairs) result.set(addr, pools);
+  return result;
 }
 
 export function watchNewMarkets(

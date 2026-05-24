@@ -14,7 +14,10 @@ import {
   type P256Credential,
 } from "viem/account-abstraction";
 import { createPublicClient } from "viem";
+import { useEffect, useState } from "react";
 import { arcTestnet } from "./arc";
+import { publicClient } from "./arc";
+import { USDC_ADDRESS } from "./contracts";
 
 const clientKey = process.env.NEXT_PUBLIC_CIRCLE_CLIENT_KEY ?? "";
 const clientUrl =
@@ -88,4 +91,44 @@ export async function getSmartAccount(
     client: modularPublicClient,
     owner: toWebAuthnAccount({ credential: cred }),
   });
+}
+
+const ERC20_BALANCE_ABI = [
+  {
+    type: "function",
+    name: "balanceOf",
+    inputs: [{ name: "account", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+  },
+] as const;
+
+export function useUsdcBalance(address: `0x${string}` | null): bigint | null {
+  const [balance, setBalance] = useState<bigint | null>(null);
+
+  useEffect(() => {
+    if (!address) { setBalance(null); return; }
+
+    let cancelled = false;
+
+    async function fetch() {
+      try {
+        const raw = await publicClient.readContract({
+          address: USDC_ADDRESS,
+          abi: ERC20_BALANCE_ABI,
+          functionName: "balanceOf",
+          args: [address!],
+        });
+        if (!cancelled) setBalance(raw as bigint);
+      } catch {
+        // silently ignore — balance stays null
+      }
+    }
+
+    fetch();
+    const id = setInterval(fetch, 12_000); // refresh every ~1 block
+    return () => { cancelled = true; clearInterval(id); };
+  }, [address]);
+
+  return balance;
 }

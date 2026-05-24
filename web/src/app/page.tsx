@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   getAllMarketEvents,
   watchNewMarkets,
+  getLivePools,
   type MarketCreatedEvent,
 } from "@/lib/markets";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -20,6 +21,7 @@ export default function HomePage() {
   const [markets, setMarkets] = useState<MarketCreatedEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [livePools, setLivePools] = useState<Map<`0x${string}`, { yesPool: bigint; noPool: bigint }>>(new Map());
   const unwatchRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
@@ -76,6 +78,29 @@ export default function HomePage() {
       unwatchRef.current?.();
     };
   }, [loading]);
+
+  // Refresh live pool values whenever markets list changes or on a 30s interval.
+  useEffect(() => {
+    if (markets.length === 0) return;
+    const now = Math.floor(Date.now() / 1000);
+    const openAddresses = markets
+      .filter((m) => now < Number(m.resolvesAt))
+      .map((m) => m.market);
+
+    let cancelled = false;
+    async function refresh() {
+      try {
+        const pools = await getLivePools(openAddresses);
+        if (!cancelled) setLivePools(pools);
+      } catch {
+        // silently ignore — stale data stays
+      }
+    }
+
+    refresh();
+    const id = setInterval(refresh, 30_000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, [markets]);
 
   const now = Math.floor(Date.now() / 1000);
   const openMarkets = markets.filter((m) => now < Number(m.resolvesAt));
@@ -148,7 +173,12 @@ export default function HomePage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {openMarkets.map((m) => (
                   <ErrorBoundary key={m.market} label={`MarketCard:${m.market.slice(0,8)}`}>
-                    <MarketCard event={m} state={0} />
+                    <MarketCard
+                      event={m}
+                      state={0}
+                      liveYesPool={livePools.get(m.market)?.yesPool}
+                      liveNoPool={livePools.get(m.market)?.noPool}
+                    />
                   </ErrorBoundary>
                 ))}
               </div>

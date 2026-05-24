@@ -27,7 +27,7 @@ import {
   calcShares,
   type MarketInfo,
 } from "@/lib/markets";
-import { bundlerClient } from "@/lib/wallets";
+import { bundlerClient, useUsdcBalance } from "@/lib/wallets";
 import { encodeFunctionData, parseUnits, type Hex } from "viem";
 import { BinaryMarketAbi } from "@/lib/contracts";
 import { toast } from "sonner";
@@ -58,7 +58,8 @@ type BetSide = "yes" | "no";
 type TxStatus = "idle" | "approving" | "confirming" | "done" | "error";
 
 export function BetSheet({ market, open, onClose, onBetPlaced }: BetSheetProps) {
-  const { account, connected, connect } = useWallet();
+  const { account, connected, connect, address } = useWallet();
+  const usdcBalance = useUsdcBalance(address ?? null);
   const [side, setSide] = useState<BetSide>("yes");
   const [amountStr, setAmountStr] = useState("5");
   const [txStatus, setTxStatus] = useState<TxStatus>("idle");
@@ -121,6 +122,7 @@ export function BetSheet({ market, open, onClose, onBetPlaced }: BetSheetProps) 
           { to: market.address, data: betData },
         ],
         paymaster: true,
+        maxPriorityFeePerGas: 1_000_000_000n, // Arc bundler minimum: 1 gwei
       });
 
       const { receipt } = await bundlerClient.waitForUserOperationReceipt({
@@ -215,9 +217,16 @@ export function BetSheet({ market, open, onClose, onBetPlaced }: BetSheetProps) 
 
           {/* Amount */}
           <div className="flex flex-col gap-2">
-            <Label htmlFor="bet-amount" className="text-xs text-muted-foreground uppercase tracking-widest">
-              Amount (USDC)
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="bet-amount" className="text-xs text-muted-foreground uppercase tracking-widest">
+                Amount (USDC)
+              </Label>
+              {usdcBalance !== null && (
+                <span className="text-xs text-muted-foreground font-mono tabular-nums">
+                  Balance: {formatUsdc(usdcBalance)} USDC
+                </span>
+              )}
+            </div>
             <div className="relative">
               <Input
                 id="bet-amount"

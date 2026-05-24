@@ -13,6 +13,7 @@ from agent.bus import SignalBus
 from agent.chain import ChainClient
 from agent.collectors.nfi_blacklist import nfi_blacklist_collector
 from agent.collectors.price_anomaly import add_to_watchlist, price_anomaly_collector
+from agent.collectors.rugjeez_blacklist import rugjeez_blacklist_collector
 from agent.demo_api import load_candidates, make_router
 from agent.executor import execute
 from agent.logging import configure_logging, get_logger
@@ -112,6 +113,7 @@ async def main() -> None:
     collectors = [
         nfi_blacklist_collector(bus),
         price_anomaly_collector(bus),
+        rugjeez_blacklist_collector(bus),
     ]
     log.info("watching_collectors", count=len(collectors))
 

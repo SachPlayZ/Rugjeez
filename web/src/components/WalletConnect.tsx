@@ -9,7 +9,9 @@ import {
   loginPasskey,
   registerPasskey,
   getSmartAccount,
+  useUsdcBalance,
 } from "@/lib/wallets";
+import { formatUsdc } from "@/lib/contracts";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -237,6 +239,7 @@ interface WalletConnectButtonProps {
 
 export function WalletConnectButton({ className }: WalletConnectButtonProps) {
   const { connected, address, connect, disconnect, connecting } = useWallet();
+  const balance = useUsdcBalance(address);
 
   if (connecting) {
     return (
@@ -250,6 +253,11 @@ export function WalletConnectButton({ className }: WalletConnectButtonProps) {
   if (connected && address) {
     return (
       <div className={cn("flex items-center gap-2", className)}>
+        {balance !== null && (
+          <span className="text-xs font-mono text-muted-foreground tabular-nums">
+            {formatUsdc(balance)} USDC
+          </span>
+        )}
         <AddressCopy address={address} />
         <Button
           variant="ghost"
