@@ -25,14 +25,64 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "500"],
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
 export const metadata: Metadata = {
-  title: "Rugjeez — AI Prediction Markets",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Rugjeez — AI Prediction Markets",
+    template: "%s · Rugjeez",
+  },
   description:
     "Autonomous AI agent on Arc that mints binary prediction markets when rug signals cross threshold. Bet USDC on whether flagged tokens will collapse.",
   openGraph: {
     title: "Rugjeez — AI Prediction Markets",
     description: "Autonomous prediction markets powered by AI rug detection.",
     type: "website",
+    url: siteUrl,
+    siteName: "Rugjeez",
+    images: [
+      {
+        url: "/Rugjeez Banner.png",
+        width: 1200,
+        height: 630,
+        alt: "Rugjeez — AI Prediction Markets",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rugjeez — AI Prediction Markets",
+    description: "Autonomous prediction markets powered by AI rug detection.",
+    images: ["/Rugjeez Banner.png"],
+  },
+  icons: {
+    icon: [
+      { url: "/favicon/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/favicon/apple-touch-icon.png",
+    other: [
+      { rel: "manifest", url: "/favicon/site.webmanifest" },
+    ],
+  },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Rugjeez",
+  url: siteUrl,
+  description:
+    "Autonomous AI agent on Arc Testnet that mints binary prediction markets when rug-pull signals cross a threshold. Bet USDC on whether flagged tokens will collapse.",
+  applicationCategory: "FinanceApplication",
+  operatingSystem: "Web",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
   },
 };
 
@@ -46,6 +96,12 @@ export default function RootLayout({
       lang="en"
       className={`${instrumentSerif.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <WalletProvider>
           <TooltipProvider>

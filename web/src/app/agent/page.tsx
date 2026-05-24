@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Navbar } from "@/components/Navbar";
 import { StatusFooter } from "@/components/StatusFooter";
 import { WalletProvider } from "@/components/WalletConnect";
@@ -6,6 +7,25 @@ import { Separator } from "@/components/ui/separator";
 import { AGENT_ADDRESS, MARKET_REGISTRY_ADDRESS, TRACE_REGISTRY_ADDRESS } from "@/lib/contracts";
 import { explorerAddress } from "@/lib/arc";
 import { ExternalLink, Bot, Shield, GitBranch, Zap, Database } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Agent",
+  description:
+    "How Rugjeez works: multi-signal rug detection, Groq-powered reasoning, IPFS-pinned traces, and autonomous market minting on Arc Testnet.",
+  openGraph: {
+    title: "Rugjeez Agent · Methodology & Contracts",
+    description:
+      "Multi-signal rug detection, AI reasoning, and autonomous market minting on Arc Testnet.",
+    images: [{ url: "/Rugjeez Banner.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rugjeez Agent · Methodology & Contracts",
+    description:
+      "Multi-signal rug detection, AI reasoning, and autonomous market minting on Arc Testnet.",
+    images: ["/Rugjeez Banner.png"],
+  },
+};
 
 const SIGNALS = [
   {
