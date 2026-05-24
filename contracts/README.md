@@ -1,6 +1,6 @@
 # contracts/
 
-Foundry project for RugOracle's on-chain protocol. Three contracts on Arc Testnet.
+Foundry project for Rugjeez's on-chain protocol. Three contracts on Arc Testnet.
 
 ## Contracts
 

@@ -1,4 +1,4 @@
-# RugOracle Bot
+# Rugjeez Bot
 
 Watches `MarketRegistry.MarketCreated` events on Arc Testnet and posts to Telegram within 30s.
 
@@ -20,7 +20,7 @@ cp .env.example .env
 ## Run
 
 ```bash
-uv run rugoracle-bot
+uv run rugjeez-bot
 # or
 python -m bot.main
 ```
@@ -37,7 +37,7 @@ Health check: `curl http://localhost:8788/health`
 | `TRACE_REGISTRY_ADDRESS` | yes | — | From Module 1 deploy |
 | `TELEGRAM_BOT_TOKEN` | yes | — | From @BotFather |
 | `TELEGRAM_CHAT_ID` | yes | — | Channel id or `@handle` |
-| `WEB_BASE_URL` | no | `https://rugoracle.xyz` | Deep link base |
+| `WEB_BASE_URL` | no | `https://rugjeez.xyz` | Deep link base |
 | `EXPLORER_URL` | no | `https://testnet.arcscan.app` | Trace tx links |
 | `IPFS_GATEWAY` | no | `https://gateway.pinata.cloud/ipfs/` | For trace fetch |
 | `DB_PATH` | no | `bot_state.db` | SQLite state file |

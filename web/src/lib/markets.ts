@@ -43,7 +43,7 @@ export interface MarketCreatedEvent {
   transactionHash: `0x${string}`;
 }
 
-const CACHE_KEY = "rugoracle:markets:v1";
+const CACHE_KEY = "rugjeez:markets:v1";
 
 function getCachedMarkets(): { block: string; markets: MarketCreatedEvent[] } | null {
   if (typeof window === "undefined") return null;

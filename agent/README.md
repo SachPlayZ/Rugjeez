@@ -1,4 +1,4 @@
-# RugOracle Agent
+# Rugjeez Agent
 
 Python agent that watches rug-pull signals and autonomously mints binary prediction markets on Arc Testnet.
 

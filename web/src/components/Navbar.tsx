@@ -27,7 +27,7 @@ export function Navbar() {
             <div className="size-7 rounded flex items-center justify-center bg-primary text-primary-foreground">
               <Zap className="size-4" />
             </div>
-            <span>RugOracle</span>
+            <span>Rugjeez</span>
           </Link>
           <nav className="hidden sm:flex items-center gap-1">
             {NAV_ITEMS.map((item) => (

@@ -1,6 +1,6 @@
-# RugOracle — Frontend
+# Rugjeez — Frontend
 
-Next.js 14 App Router frontend for RugOracle, the autonomous AI prediction market agent on Arc Testnet.
+Next.js 14 App Router frontend for Rugjeez, the autonomous AI prediction market agent on Arc Testnet.
 
 ## Stack
 

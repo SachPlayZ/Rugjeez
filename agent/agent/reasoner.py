@@ -13,7 +13,7 @@ log = get_logger(__name__)
 
 _DEFAULT_MODEL = "qwen/qwen3-32b"
 
-_SYSTEM = """You are RugOracle's risk analyst. Given a set of signals about a token,
+_SYSTEM = """You are Rugjeez's risk analyst. Given a set of signals about a token,
 decide whether to open a prediction market betting on whether the token will lose >50%
 in 7 days. Return ONLY valid JSON matching this exact schema:
 

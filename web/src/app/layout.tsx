@@ -21,11 +21,11 @@ const instrumentSans = Instrument_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "RugOracle — AI Prediction Markets",
+  title: "Rugjeez — AI Prediction Markets",
   description:
     "Autonomous AI agent on Arc that mints binary prediction markets when rug signals cross threshold. Bet USDC on whether flagged tokens will collapse.",
   openGraph: {
-    title: "RugOracle — AI Prediction Markets",
+    title: "Rugjeez — AI Prediction Markets",
     description: "Autonomous prediction markets powered by AI rug detection.",
     type: "website",
   },

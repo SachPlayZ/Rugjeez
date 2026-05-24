@@ -1,4 +1,4 @@
-## RugOracle — infra Makefile
+## Rugjeez — infra Makefile
 ## Run from the repo root via `make -f infra/Makefile` or from infra/ directly.
 ##
 ## Prerequisites:

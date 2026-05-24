@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Print health status for every RugOracle service.
+# Print health status for every Rugjeez service.
 # Exit code 0 = all green, 1 = any yellow/red.
 set -euo pipefail
 
@@ -27,12 +27,12 @@ check() {
   local response
   local http_code
 
-  http_code=$(curl -s -o /tmp/_rugoracle_health -w "%{http_code}" --max-time 5 "$url" 2>/dev/null) || true
+  http_code=$(curl -s -o /tmp/_rugjeez_health -w "%{http_code}" --max-time 5 "$url" 2>/dev/null) || true
   [[ -z "$http_code" ]] && http_code="000"
 
   if [[ "$http_code" == "200" ]]; then
     local status
-    status=$(python3 -c "import json,sys; d=json.load(open('/tmp/_rugoracle_health')); print(d.get('status','?'))" 2>/dev/null || echo "?")
+    status=$(python3 -c "import json,sys; d=json.load(open('/tmp/_rugjeez_health')); print(d.get('status','?'))" 2>/dev/null || echo "?")
     if [[ "$status" == "ok" ]]; then
       echo -e "  ${GRN}●${NC} $name — OK"
     else
@@ -43,7 +43,7 @@ check() {
     python3 -c "
 import json, sys
 try:
-    d = json.load(open('/tmp/_rugoracle_health'))
+    d = json.load(open('/tmp/_rugjeez_health'))
     for k in ['uptime_seconds','last_signal_seen_at','last_market_minted_at','in_flight_mints','errors_last_hour']:
         if k in d:
             print(f'      {k}: {d[k]}')
@@ -60,7 +60,7 @@ except Exception:
 }
 
 echo ""
-echo "RugOracle service health"
+echo "Rugjeez service health"
 echo "========================"
 check "Agent (demo API + health)" "http://$AGENT_HOST:$AGENT_PORT/health"
 check "Bot"                        "http://127.0.0.1:$BOT_PORT/health"

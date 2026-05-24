@@ -1,6 +1,6 @@
-# RugOracle — infra
+# Rugjeez — infra
 
-Deploy, run, and seed scripts for RugOracle.
+Deploy, run, and seed scripts for Rugjeez.
 
 ## Quick start (first time)
 

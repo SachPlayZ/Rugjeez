@@ -54,7 +54,7 @@ export default function AgentPage() {
               </div>
               <div>
                 <h1 className="font-heading text-2xl font-semibold tracking-tight">
-                  RugOracle Agent
+                  Rugjeez Agent
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   Autonomous AI prediction market minter on Arc Testnet
@@ -78,7 +78,7 @@ export default function AgentPage() {
           <section className="flex flex-col gap-4 mb-8">
             <h2 className="font-heading text-base font-semibold">Methodology</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              RugOracle continuously watches multiple signal sources. When a flagged token
+              Rugjeez continuously watches multiple signal sources. When a flagged token
               crosses a weighted signal threshold, it scores the risk, generates a structured
               reasoning trace using Groq's Qwen3-32B model, pins the trace to IPFS, records
               the hash on-chain, and mints a binary prediction market — all within ~10 seconds

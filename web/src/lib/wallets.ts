@@ -37,7 +37,7 @@ export const modularPublicClient = modularTransport
   ? createPublicClient({ chain: arcTestnet, transport: modularTransport })
   : null;
 
-const CRED_KEY = "rugoracle:credential";
+const CRED_KEY = "rugjeez:credential";
 
 export function loadCredential(): P256Credential | null {
   if (typeof window === "undefined") return null;

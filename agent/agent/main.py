@@ -29,7 +29,7 @@ log = get_logger(__name__)
 _CORS_ORIGIN = os.getenv("CORS_ORIGIN", "*")
 
 # FastAPI app — serves /health and /demo-<secret> endpoints
-app = FastAPI(title="RugOracle Agent")
+app = FastAPI(title="Rugjeez Agent")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[_CORS_ORIGIN] if _CORS_ORIGIN != "*" else ["*"],
