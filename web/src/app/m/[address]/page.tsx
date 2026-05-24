@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { StatusFooter } from "@/components/StatusFooter";
 import { WalletProvider } from "@/components/WalletConnect";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { TraceViewer } from "@/components/TraceViewer";
 import { BetSheet } from "@/components/BetSheet";
 import { OddsDisplay } from "@/components/OddsDisplay";
@@ -248,11 +249,13 @@ export default function MarketDetailPage({
                   AI Reasoning
                 </h2>
                 {trace ? (
-                  <TraceViewer
-                    ipfsCid={trace.ipfsCid}
-                    traceHash={market.traceHash}
-                    agentSignature={trace.signature}
-                  />
+                  <ErrorBoundary label="TraceViewer">
+                    <TraceViewer
+                      ipfsCid={trace.ipfsCid}
+                      traceHash={market.traceHash}
+                      agentSignature={trace.signature}
+                    />
+                  </ErrorBoundary>
                 ) : (
                   <div className="p-4 rounded-lg border border-border/60 bg-card text-sm text-muted-foreground">
                     Reasoning trace not yet available.
@@ -284,14 +287,16 @@ export default function MarketDetailPage({
           )}
 
           {market && (
-            <BetSheet
-              market={market}
-              open={betOpen}
-              onClose={() => setBetOpen(false)}
-              onBetPlaced={() => {
-                getMarketDetail(marketAddress).then(setMarket).catch(() => {});
-              }}
-            />
+            <ErrorBoundary label="BetSheet">
+              <BetSheet
+                market={market}
+                open={betOpen}
+                onClose={() => setBetOpen(false)}
+                onBetPlaced={() => {
+                  getMarketDetail(marketAddress).then(setMarket).catch(() => {});
+                }}
+              />
+            </ErrorBoundary>
           )}
         </main>
         <StatusFooter />

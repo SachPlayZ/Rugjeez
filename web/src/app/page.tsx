@@ -12,6 +12,7 @@ import {
   watchNewMarkets,
   type MarketCreatedEvent,
 } from "@/lib/markets";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Activity, Zap } from "lucide-react";
 import { toast } from "sonner";
 
@@ -146,7 +147,9 @@ export default function HomePage() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {openMarkets.map((m) => (
-                  <MarketCard key={m.market} event={m} state={0} />
+                  <ErrorBoundary key={m.market} label={`MarketCard:${m.market.slice(0,8)}`}>
+                    <MarketCard event={m} state={0} />
+                  </ErrorBoundary>
                 ))}
               </div>
             )}
@@ -165,7 +168,9 @@ export default function HomePage() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {closedMarkets.slice(0, 6).map((m) => (
-                  <MarketCard key={m.market} event={m} state={1} />
+                  <ErrorBoundary key={m.market} label={`MarketCard:${m.market.slice(0,8)}`}>
+                    <MarketCard event={m} state={1} />
+                  </ErrorBoundary>
                 ))}
               </div>
             </section>
