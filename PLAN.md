@@ -312,7 +312,7 @@ Four planes:
 | 3 | `agent/demo` — manual signal injection endpoint | `complete` | 2 |
 | 4 | `web/` — Next.js frontend | `complete` | 1 (and 2 for live data) |
 | 5 | `web/demo` — demo trigger button UI | `complete` | 3, 4 |
-| 6 | `bot/` — Twitter/Telegram poster | `in_progress` | 1 |
+| 6 | `bot/` — Twitter/Telegram poster | `complete` | 1 |
 | 7 | `infra/` — deploy + run scripts | `not_started` | all |
 | 8 | `submission` — video, README, form | `not_started` | all |
 
@@ -840,7 +840,7 @@ web/src/app/demo/
 
 # Module 6 — `bot/` — Twitter/Telegram poster
 
-**Status:** `in_progress` · **Depends on:** Module 1
+**Status:** `complete` · **Depends on:** Module 1
 
 **Purpose.** Auto-post every new market. Traction engine that runs 24/7 after launch.
 
@@ -887,18 +887,24 @@ bot/
 - Demo-injected markets get a tag in the post (e.g. "🧪 demo mint") for honesty
 
 ### Cross-cutting checklist
-- [ ] WSS reconnect-with-backoff (start 1s, cap at 60s, jitter)
-- [ ] Last-seen block persisted to disk so a restart doesn't replay or miss events
-- [ ] `GET /health` endpoint live
-- [ ] Structured JSON logging matching agent's format
-- [ ] Idempotent: posting twice for the same `MarketCreated` event is detected and skipped (track posted market addresses in a small SQLite or even a flat file)
+- [x] WSS reconnect-with-backoff (start 1s, cap at 60s, jitter)
+- [x] Last-seen block persisted to disk so a restart doesn't replay or miss events
+- [x] `GET /health` endpoint live
+- [x] Structured JSON logging matching agent's format
+- [x] Idempotent: posting twice for the same `MarketCreated` event is detected and skipped (track posted market addresses in a small SQLite or even a flat file)
 
 ### Handoff (filled when complete)
-- Telegram channel link:
-- Bot deployment host:
+- Telegram channel link: set `TELEGRAM_CHAT_ID` after @BotFather setup (not yet deployed)
+- Bot deployment host: local for now; `python -m bot.main` or `rugoracle-bot` script
 
 ### Notes (filled when complete)
-*To be filled by Claude when module marked complete.*
+- WSS subscription uses raw `websockets` lib for full reconnect control; HTTP `AsyncWeb3` used for `getTrace` reads and backfill `eth_getLogs`.
+- On restart, bot replays from `last_block` via `eth_getLogs` before subscribing live — no missed events.
+- Trace enrichment: `getTrace(traceHash)` → IPFS CID → fetch JSON → extract `confidence` + `signals[].source`. Falls back to `?` if IPFS slow/unavailable.
+- Demo marker: any signal with `source == "manual_demo"` adds `🧪 demo mint` line.
+- Twitter stub in `bot/twitter.py` — raises `NotImplementedError`; skip by not setting `TWITTER_*` env vars.
+- Health endpoint on port `8788` (not 8787 to avoid clash with agent demo API).
+- `bot/.venv/` should be gitignored.
 
 ---
 
