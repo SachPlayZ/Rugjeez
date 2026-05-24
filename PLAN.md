@@ -311,7 +311,7 @@ Four planes:
 | 2 | `agent/` — Python agent + collectors | `complete` | 1 |
 | 3 | `agent/demo` — manual signal injection endpoint | `complete` | 2 |
 | 4 | `web/` — Next.js frontend | `complete` | 1 (and 2 for live data) |
-| 5 | `web/demo` — demo trigger button UI | `not_started` | 3, 4 |
+| 5 | `web/demo` — demo trigger button UI | `in_progress` | 3, 4 |
 | 6 | `bot/` — Twitter/Telegram poster | `not_started` | 1 |
 | 7 | `infra/` — deploy + run scripts | `not_started` | all |
 | 8 | `submission` — video, README, form | `not_started` | all |
