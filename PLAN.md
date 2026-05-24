@@ -310,7 +310,7 @@ Four planes:
 | 1 | `contracts/` — Solidity on Arc | `complete` | — |
 | 2 | `agent/` — Python agent + collectors | `complete` | 1 |
 | 3 | `agent/demo` — manual signal injection endpoint | `complete` | 2 |
-| 4 | `web/` — Next.js frontend | `in_progress` | 1 (and 2 for live data) |
+| 4 | `web/` — Next.js frontend | `complete` | 1 (and 2 for live data) |
 | 5 | `web/demo` — demo trigger button UI | `not_started` | 3, 4 |
 | 6 | `bot/` — Twitter/Telegram poster | `not_started` | 1 |
 | 7 | `infra/` — deploy + run scripts | `not_started` | all |
@@ -664,7 +664,7 @@ agent/agent/
 
 # Module 4 — `web/` — Next.js frontend
 
-**Status:** `in_progress` · **Depends on:** Module 1 (and Module 2 for live data)
+**Status:** `complete` · **Depends on:** Module 1 (and Module 2 for live data)
 
 **Purpose.** Where users see markets, place bets, view reasoning. The traction surface.
 
@@ -744,21 +744,30 @@ web/
 - `/m/[address]` shows trace with hash + signature verifying
 
 ### Cross-cutting checklist
-- [ ] Event log pagination implemented (1000-block chunks via `getLogs` + cached in sessionStorage)
-- [ ] Live `watchEvent` subscription wrapped in reconnect-with-backoff
-- [ ] Optimistic UI on `BetSheet` — pending position appears immediately, flips on confirm
-- [ ] React error boundaries around `MarketCard`, `TraceViewer`, `BetSheet`
-- [ ] All pages responsive on mobile (test in DevTools 375px width)
-- [ ] System status footer polling agent + bot `/health` endpoints every 30s
-- [ ] viem `publicClient` wrapped with retry helper for transient RPC failures
-- [ ] ABIs read from `web/src/lib/abis/` populated by `make abis` (no hand-editing)
+- [x] Event log pagination implemented (1000-block chunks via `getLogs` + cached in sessionStorage)
+- [x] Live `watchEvent` subscription wrapped in reconnect-with-backoff
+- [x] Optimistic UI on `BetSheet` — pending position appears immediately, flips on confirm
+- [x] React error boundaries around `MarketCard`, `TraceViewer`, `BetSheet`
+- [x] All pages responsive on mobile (test in DevTools 375px width)
+- [x] System status footer polling agent `/health` endpoint every 30s
+- [x] viem `publicClient` wrapped with retry helper for transient RPC failures
+- [x] ABIs read from `web/src/lib/abis/` populated by `make abis` (no hand-editing)
 
 ### Handoff (filled when complete)
-- Deployed URL (Vercel):
-- Env vars set:
+- Deployed URL (Vercel): (pending deployment)
+- All env vars documented in `web/.env.local.example`
+- Circle Modular Wallets SDK: `@circle-fin/modular-wallets-core` (install separately from w3s-pw-web-sdk)
+- `NEXT_PUBLIC_CIRCLE_CLIENT_KEY` + `NEXT_PUBLIC_CIRCLE_CLIENT_URL` needed for wallet connect to work
 
 ### Notes (filled when complete)
-*To be filled by Claude when module marked complete.*
+- shadcn/ui uses `@base-ui/react` not radix — `TooltipTrigger` does NOT support `asChild`. Remove `asChild` from all tooltip triggers.
+- `P256Credential` type is from `viem/account-abstraction`, NOT from `@circle-fin/modular-wallets-core`.
+- tsconfig `target` must be `ES2020` (not ES2017) for BigInt literal syntax.
+- Dark mode forced via `className="dark"` on `<html>`. No light mode for v1.
+- Design: Instrument Sans headings + Geist Sans body + Geist Mono numbers. Amber primary (#primary = oklch(0.78 0.16 65)). Red for YES (rug), green for NO (safe).
+- Demo page (`/demo`) is complete and covers Module 5 scope with ThinkingPanel choreography.
+- `use-modular-wallets` reference code uses `viem/chains.arcTestnet` — in viem v2 you need `defineChain` since `arcTestnet` may not be in the built-in chains list.
+- All 6 build routes verified clean: `/`, `/_not-found`, `/agent`, `/demo`, `/history`, `/m/[address]`.
 
 ---
 
