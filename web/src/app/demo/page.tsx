@@ -16,9 +16,9 @@ import { CandidateCard, type Candidate } from "./components/CandidateCard";
 import { FlaskConical } from "lucide-react";
 import { toast } from "sonner";
 
-const DEMO_API_URL =
-  process.env.NEXT_PUBLIC_AGENT_DEMO_URL ?? "http://localhost:8787";
-const DEMO_SECRET = process.env.NEXT_PUBLIC_DEMO_API_SECRET ?? "x9k2vp4z";
+// Calls go to Next.js API routes (server-side) to avoid mixed-content blocks
+const CANDIDATES_URL = "/api/demo/candidates";
+const INJECT_URL = "/api/demo/inject";
 
 export default function DemoPage() {
   const router = useRouter();
@@ -35,9 +35,7 @@ export default function DemoPage() {
   // Fetch candidates from agent on mount
   useEffect(() => {
     const controller = new AbortController();
-    fetch(`${DEMO_API_URL}/demo-${DEMO_SECRET}/candidates`, {
-      signal: controller.signal,
-    })
+    fetch(CANDIDATES_URL, { signal: controller.signal })
       .then((r) => {
         if (!r.ok) throw new Error(`Agent returned ${r.status}`);
         return r.json();
@@ -117,7 +115,7 @@ export default function DemoPage() {
 
     // POST the injection
     try {
-      const res = await fetch(`${DEMO_API_URL}/demo-${DEMO_SECRET}/inject`, {
+      const res = await fetch(INJECT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ candidate_id: candidate.id }),
