@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Instrument_Serif, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
+import { WalletProvider } from "@/components/WalletConnect";
 import "./globals.css";
 
 const instrumentSerif = Instrument_Serif({
@@ -45,10 +46,12 @@ export default function RootLayout({
       className={`${instrumentSerif.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <TooltipProvider>
-          {children}
-          <Toaster position="bottom-right" richColors theme="dark" />
-        </TooltipProvider>
+        <WalletProvider>
+          <TooltipProvider>
+            {children}
+            <Toaster position="bottom-right" richColors theme="dark" />
+          </TooltipProvider>
+        </WalletProvider>
       </body>
     </html>
   );

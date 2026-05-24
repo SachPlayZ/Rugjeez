@@ -6,6 +6,7 @@ import { LiveStatsBar } from "./_components/LiveStatsBar";
 import { LiveMarketTable } from "./_components/LiveMarketTable";
 import { SignalGrid } from "./_components/SignalGrid";
 import { LiveFooterBlock } from "./_components/LiveFooterBlock";
+import { LandingNav } from "./_components/LandingNav";
 
 /* ─── Static ticker items (agent adds live tokens dynamically) ─ */
 const TICKER_ITEMS = [
@@ -31,74 +32,65 @@ export default function LandingPage() {
   return (
     <div data-page="landing">
 
-      {/* ── TOP TICKER ────────────────────────────────────── */}
-      <div className="rj-ticker" aria-hidden="true">
-        <div className="rj-ticker__track">
-          {tickerItems.map((item, i) => (
-            <span key={i}>
-              <span className={`rj-ticker__item${!item.alert ? " rj-ticker__item--safe" : ""}`}>
-                <span className="rj-ticker__dot" />
-                <span>{item.t}</span>
-                <span className={`rj-ticker__pct--${item.dir === "up" ? "up" : "down"}`}>{item.p}</span>
+      {/* ══ FIRST FOLD — ticker + nav + hero = 100vh ════════ */}
+      <div className="rj-fold">
+
+        {/* ── TOP TICKER ──────────────────────────────────── */}
+        <div className="rj-ticker" aria-hidden="true">
+          <div className="rj-ticker__track">
+            {tickerItems.map((item, i) => (
+              <span key={i}>
+                <span className={`rj-ticker__item${!item.alert ? " rj-ticker__item--safe" : ""}`}>
+                  <span className="rj-ticker__dot" />
+                  <span>{item.t}</span>
+                  <span className={`rj-ticker__pct--${item.dir === "up" ? "up" : "down"}`}>{item.p}</span>
+                </span>
+                <span className="rj-ticker__sep">·</span>
               </span>
-              <span className="rj-ticker__sep">·</span>
-            </span>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* ── NAV ───────────────────────────────────────────── */}
-      <header className="rj-wrap">
-        <nav className="rj-nav">
-          <a className="rj-brand" href="#">Rug<i>jeez</i><b>v0 · ARC TESTNET</b></a>
-          <div className="rj-nav__links">
-            <a href="#problem">Problem</a>
-            <a href="#how">How it works</a>
-            <a href="#signals">Signals</a>
-            <a href="#markets">Markets</a>
-            <a href="#agent">Agent</a>
-            <a href="#faq">FAQ</a>
-          </div>
-          <div>
-            <a className="rj-btn rj-btn--solid" href="#markets">View live markets →</a>
-          </div>
-        </nav>
-      </header>
+        {/* ── NAV — icons + app routes + wallet ───────────── */}
+        <header className="rj-wrap">
+          <LandingNav />
+        </header>
 
-      {/* ── HERO ──────────────────────────────────────────── */}
-      <section className="rj-hero">
-        <div className="rj-wrap">
-          <div className="rj-hero__grid">
-            {/* Left col */}
-            <div>
-              <span className="rj-eyebrow">
-                <span className="rj-dot" />
-                Agent live · scanning 1,284 tokens
-              </span>
-              <h1 className="rj-h1">
-                An AI agent that bets on <span className="rj-it">rug pulls</span>{" "}
-                <span className="rj-mint">— before they happen.</span>
-              </h1>
-              <p className="rj-hero__lede">
-                Rugjeez detects danger signals, mints a market on{" "}
-                <b style={{ color: "var(--rj-paper)" }}>Arc Testnet</b>, and lets
-                the crowd price the risk. The chain resolves it 7 days later.
-              </p>
-              <div className="rj-hero__cta">
-                <a className="rj-btn rj-btn--solid rj-btn--lg" href="#markets">View live markets →</a>
-                <a className="rj-btn rj-btn--ghost rj-btn--lg" href="#how">How it works</a>
-                <span className="rj-hint">USDC betting · 7-day settlement · open source</span>
+        {/* ── HERO ────────────────────────────────────────── */}
+        <section className="rj-hero">
+          <div className="rj-wrap">
+            <div className="rj-hero__grid">
+              {/* Left col */}
+              <div>
+                <span className="rj-eyebrow">
+                  <span className="rj-dot" />
+                  Agent live · scanning 1,284 tokens
+                </span>
+                <h1 className="rj-h1">
+                  An AI agent that bets on <span className="rj-it">rug pulls</span>{" "}
+                  <span className="rj-mint">— before they happen.</span>
+                </h1>
+                <p className="rj-hero__lede">
+                  Rugjeez detects danger signals, mints a market on{" "}
+                  <b style={{ color: "var(--rj-paper)" }}>Arc Testnet</b>, and lets
+                  the crowd price the risk. The chain resolves it 7 days later.
+                </p>
+                <div className="rj-hero__cta">
+                  <a className="rj-btn rj-btn--solid rj-btn--lg" href="#markets">Live markets →</a>
+                  <a className="rj-btn rj-btn--ghost rj-btn--lg" href="#how">How it works</a>
+                  <span className="rj-hint">USDC betting · 7-day settlement · open source</span>
+                </div>
+                {/* Live stats — fetched from on-chain */}
+                <LiveHeroStats />
               </div>
 
-              {/* Live stats — fetched from on-chain */}
-              <LiveHeroStats />
+              {/* Right col — live gauge */}
+              <LiveGauge />
             </div>
-
-            {/* Live gauge — shows latest minted market */}
-            <LiveGauge />
           </div>
-        </div>
-      </section>
+        </section>
+
+      </div>{/* end .rj-fold */}
 
       {/* ── THE PROBLEM ───────────────────────────────────── */}
       <section className="rj-section rj-problem" id="problem">
