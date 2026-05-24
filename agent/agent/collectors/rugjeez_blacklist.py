@@ -9,6 +9,7 @@ from typing import AsyncGenerator
 
 import aiohttp
 
+from agent import health as agent_health
 from agent.logging import get_logger
 from agent.models import Signal
 
@@ -62,8 +63,13 @@ async def rugjeez_blacklist_collector(bus) -> AsyncGenerator[None, None]:
                     known = current
                     first_run = False
                     log.info("rugjeez_baseline", count=len(known), url=_BLACKLIST_URL)
+                    agent_health.record_event("ok", f"rugjeez blacklist loaded · {len(known)} entries")
                 else:
                     new_symbols = current - known
+                    if new_symbols:
+                        agent_health.record_event("flag", f"rugjeez · new entries: {', '.join(sorted(new_symbols)[:4])}")
+                    else:
+                        agent_health.record_event("scan", f"rugjeez check · {len(current)} entries · no new additions")
                     for sym in sorted(new_symbols):
                         log.info("rugjeez_new_entry", symbol=sym)
 
@@ -90,5 +96,6 @@ async def rugjeez_blacklist_collector(bus) -> AsyncGenerator[None, None]:
 
             except Exception as exc:
                 log.error("rugjeez_collector_error", error=str(exc))
+                agent_health.record_event("err", f"rugjeez fetch failed · {str(exc)[:60]}")
 
             await asyncio.sleep(_POLL_INTERVAL)

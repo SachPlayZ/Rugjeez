@@ -3,19 +3,23 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-interface AgentHealth {
-  status: "ok" | "offline";
-  uptime_seconds?: number;
-  last_signal_seen_at?: string | null;
-  last_market_minted_at?: string | null;
-  last_market_address?: string | null;
-  errors_last_hour?: number;
-}
-
-interface LogLine {
+interface AgentEvent {
   time: string;
   act: string;
   rest: string;
+}
+
+interface AgentHealth {
+  status: "ok" | "offline";
+  uptime_seconds?: number;
+  last_market_address?: string | null;
+  errors_last_hour?: number;
+  in_flight_mints?: number;
+  recent_events?: AgentEvent[];
+}
+
+interface DisplayLine extends AgentEvent {
+  isNew: boolean;
 }
 
 function fmtUptime(s: number) {
@@ -29,119 +33,158 @@ function nowTime() {
   return new Date().toTimeString().slice(0, 8);
 }
 
-const DEMO_LINES: LogLine[] = [
-  { time: "12:04:31", act: "scan",    rest: "0xabc…7e21 · score 23 · below threshold" },
-  { time: "12:04:32", act: "scan",    rest: "0x44ee…6cc3 · score 42 · below threshold" },
-  { time: "12:04:33", act: "scan",    rest: "0xff10…3322 · score 8  · below threshold" },
-  { time: "12:04:34", act: "scan",    rest: "0x9088…ddc2 · score 31 · below threshold" },
-  { time: "12:05:02", act: "flag",    rest: "0xdef0…1a4f · score 81 · minting market…" },
-  { time: "12:05:04", act: "mint",    rest: "market #0412 deployed at 0x7a3c…d4f1" },
-  { time: "12:05:05", act: "ok",      rest: "IPFS trace pinned · bafy…r34d" },
-  { time: "12:05:18", act: "scan",    rest: "0x12cd…e7f9 · score 14 · below threshold" },
-  { time: "12:05:22", act: "scan",    rest: "0xaa01…0bbe · score 52 · watch-listed" },
-  { time: "12:05:41", act: "resolve", rest: "market #0381 · YES wins · $57,300 distributed" },
-  { time: "12:05:42", act: "ok",      rest: "oracle posted · price feed #0xchain.usdc" },
-  { time: "12:05:58", act: "scan",    rest: "0x6bc3…11a0 · score 19 · below threshold" },
-  { time: "12:06:17", act: "flag",    rest: "0xc02d…91be · score 83 · minting market…" },
-  { time: "12:06:19", act: "mint",    rest: "market #0410 deployed at 0xc02d…91be" },
-  { time: "12:06:20", act: "ok",      rest: "IPFS trace pinned · bafy…m7q1" },
-  { time: "12:06:34", act: "scan",    rest: "0x3b18…c0aa · score 38 · below threshold" },
-  { time: "12:06:51", act: "scan",    rest: "0xf12a…7820 · score 66 · minting market…" },
-  { time: "12:06:54", act: "mint",    rest: "market #0411 deployed" },
+const DEMO_LINES: AgentEvent[] = [
+  { time: "12:04:31", act: "scan",    rest: "$MOONBARK · score 23 · from nfi_blacklist · below threshold" },
+  { time: "12:04:32", act: "scan",    rest: "$CHAD_INU · score 42 · from price_anomaly · below threshold" },
+  { time: "12:04:33", act: "scan",    rest: "$VAPORFI  · score 8  · from rugjeez_blacklist · below threshold" },
+  { time: "12:04:34", act: "scan",    rest: "$SAFERKT  · score 31 · from nfi_blacklist · below threshold" },
+  { time: "12:05:02", act: "flag",    rest: "$BARK · score 81 · threshold crossed · minting market…" },
+  { time: "12:05:04", act: "mint",    rest: "market deployed → 0x7a3c…d4f1 · $BARK" },
+  { time: "12:05:05", act: "ok",      rest: "IPFS trace pinned · bafybeig…r34d" },
+  { time: "12:05:18", act: "scan",    rest: "$NORMIES  · score 14 · from price_anomaly · below threshold" },
+  { time: "12:05:22", act: "scan",    rest: "$WGMI     · score 52 · from nfi_blacklist · watch-listed" },
+  { time: "12:05:41", act: "resolve", rest: "market 0xdef0…1a4f · YES · token rugged · drop 5813bps" },
+  { time: "12:05:42", act: "ok",      rest: "winnings distributed · $57,300 USDC settled" },
+  { time: "12:05:58", act: "scan",    rest: "$GIGAPEPE · score 19 · from rugjeez_blacklist · below threshold" },
+  { time: "12:06:17", act: "flag",    rest: "$VAPORFI  · score 83 · threshold crossed · minting market…" },
+  { time: "12:06:19", act: "mint",    rest: "market deployed → 0xc02d…91be · $VAPORFI" },
+  { time: "12:06:20", act: "ok",      rest: "IPFS trace pinned · bafybeih…m7q1" },
+  { time: "12:06:34", act: "scan",    rest: "$PUDGYDOGE · score 38 · from price_anomaly · below threshold" },
+  { time: "12:06:51", act: "flag",    rest: "$GIGAPEPE · score 66 · threshold crossed · minting market…" },
+  { time: "12:06:54", act: "mint",    rest: "market deployed → 0xf12a…7820 · $GIGAPEPE" },
 ];
 
 const COLOR_MAP: Record<string, string> = {
-  scan: "#6b7e7a",
-  flag: "var(--rj-red)",
-  mint: "var(--rj-yellow)",
+  scan:    "#6b7e7a",
+  flag:    "var(--rj-red)",
+  mint:    "var(--rj-yellow)",
   resolve: "#5ee9c8",
-  ok: "var(--rj-mint)",
+  ok:      "var(--rj-mint)",
+  err:     "var(--rj-red)",
+  signal:  "var(--rj-paper)",
 };
 
 export function LiveAgentLog() {
   const [health, setHealth] = useState<AgentHealth | null>(null);
-  const [visibleCount, setVisibleCount] = useState(0);
+  const [lines, setLines] = useState<DisplayLine[]>([]);
+  // Offline demo animation
+  const [demoCount, setDemoCount] = useState(0);
   const bodyRef = useRef<HTMLDivElement>(null);
   const notified = useRef(false);
+  const isFirstLoad = useRef(true);
+  const seenKeys = useRef(new Set<string>());
 
-  // Poll agent health
+  // Poll agent health every 5s
   useEffect(() => {
-    function load() {
-      fetch("/api/agent")
-        .then((r) => r.json())
-        .then((d: AgentHealth) => {
-          setHealth(d);
-          if (!notified.current) {
-            notified.current = true;
-            if (d.status === "offline") {
-              toast.warning("Agent offline", { description: "Showing demo log data", duration: 4000 });
-            }
+    async function load() {
+      try {
+        const res = await fetch("/api/agent");
+        if (!res.ok) throw new Error("agent unreachable");
+        const d: AgentHealth = await res.json();
+        setHealth(d);
+
+        if (!notified.current) {
+          notified.current = true;
+          if (d.status === "offline") {
+            toast.warning("Agent offline", {
+              description: "Showing demo log data",
+              duration: 4000,
+            });
           }
-        })
-        .catch(() => setHealth({ status: "offline" }));
+        }
+
+        if (d.status === "ok" && d.recent_events) {
+          const first = isFirstLoad.current;
+          isFirstLoad.current = false;
+
+          const processed: DisplayLine[] = d.recent_events.map((e) => {
+            const key = `${e.time}:${e.act}:${e.rest}`;
+            const isNew = !first && !seenKeys.current.has(key);
+            seenKeys.current.add(key);
+            return { ...e, isNew };
+          });
+          setLines(processed);
+        }
+      } catch {
+        setHealth((prev) => prev ?? { status: "offline" });
+      }
     }
+
     load();
-    const id = setInterval(load, 30_000);
+    const id = setInterval(load, 5_000);
     return () => clearInterval(id);
   }, []);
 
-  // Animate demo lines in one by one
+  // Animate demo lines in one-by-one when offline
   useEffect(() => {
-    if (visibleCount >= DEMO_LINES.length) return;
-    const id = setTimeout(() => setVisibleCount((v) => v + 1), 300);
+    if (health?.status === "ok") return;
+    if (demoCount >= DEMO_LINES.length) return;
+    const id = setTimeout(() => setDemoCount((v) => v + 1), 280);
     return () => clearTimeout(id);
-  }, [visibleCount]);
+  }, [demoCount, health?.status]);
 
-  // Auto-scroll
+  // Auto-scroll to bottom whenever lines change
   useEffect(() => {
-    if (bodyRef.current) {
-      bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
-    }
-  }, [visibleCount, health]);
+    const el = bodyRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [lines, demoCount]);
 
-  const uptime = health?.uptime_seconds != null ? fmtUptime(health.uptime_seconds) : null;
   const isOnline = health?.status === "ok";
+  const uptime =
+    health?.uptime_seconds != null ? fmtUptime(health.uptime_seconds) : null;
 
-  // Build live lines from real agent data
-  const liveLines: LogLine[] = [];
-  if (health) {
-    if (isOnline) {
-      liveLines.push({ time: nowTime(), act: "ok", rest: `AGENT ONLINE · uptime ${uptime ?? "—"}` });
-      if (health.last_market_address) {
-        liveLines.push({
-          time: health.last_market_minted_at?.slice(11, 19) ?? nowTime(),
-          act: "mint",
-          rest: `last market → ${health.last_market_address.slice(0, 10)}…${health.last_market_address.slice(-4)}`,
-        });
+  // Build display: header status line + events
+  const statusLine: DisplayLine = isOnline
+    ? {
+        time: nowTime(),
+        act: "ok",
+        rest: `agent online · uptime ${uptime ?? "—"} · ${health?.errors_last_hour ?? 0} errors/h${health?.in_flight_mints ? ` · ${health.in_flight_mints} mint in flight` : ""}`,
+        isNew: false,
       }
-      if (health.errors_last_hour && health.errors_last_hour > 0) {
-        liveLines.push({ time: nowTime(), act: "flag", rest: `${health.errors_last_hour} errors in last hour` });
-      }
-    } else {
-      liveLines.push({ time: nowTime(), act: "flag", rest: "AGENT OFFLINE — demo data below" });
-    }
-  }
+    : {
+        time: nowTime(),
+        act: "err",
+        rest: "AGENT OFFLINE — showing demo data",
+        isNew: false,
+      };
 
-  const allLines = [...liveLines, ...DEMO_LINES.slice(0, visibleCount)];
+  const displayLines: DisplayLine[] =
+    isOnline
+      ? [statusLine, ...lines]
+      : [
+          ...(health !== null ? [statusLine] : []),
+          ...DEMO_LINES.slice(0, demoCount).map((l) => ({ ...l, isNew: false })),
+        ];
 
   return (
     <div className="rj-term">
       <div className="rj-term__head">
-        <div className="rj-term__dots"><span /><span /><span /></div>
-        <div>rugjeez-agent@arc-testnet:~ · last 120 events</div>
+        <div className="rj-term__dots">
+          <span />
+          <span />
+          <span />
+        </div>
+        <div>rugjeez-agent@arc-testnet:~ · last 60 events</div>
         <div className="rj-term__pulse">
-          {isOnline ? `LIVE · uptime ${uptime}` : health ? "OFFLINE" : "CONNECTING…"}
+          {isOnline
+            ? `LIVE · uptime ${uptime}`
+            : health
+              ? "OFFLINE"
+              : "CONNECTING…"}
         </div>
       </div>
       <div className="rj-term__body" ref={bodyRef}>
-        {allLines.map((line, i) => (
-          <div className="rj-term__line" key={i} style={{ opacity: i < liveLines.length ? 1 : undefined }}>
+        {displayLines.map((line, i) => (
+          <div
+            className={`rj-term__line${line.isNew ? " rj-term__line--new" : ""}`}
+            key={i}
+          >
             <span className="rj-term__time">[{line.time}]</span>
             <span
               className={`rj-term__action ${line.act}`}
               style={{ color: COLOR_MAP[line.act] }}
             >
-              {line.act.toUpperCase()}
+              {line.act.toUpperCase().padEnd(7)}
             </span>
             <span className="rj-term__rest">{line.rest}</span>
           </div>

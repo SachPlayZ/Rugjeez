@@ -6,50 +6,16 @@ import { LiveStatsBar } from "./_components/LiveStatsBar";
 import { LiveMarketTable } from "./_components/LiveMarketTable";
 import { SignalGrid } from "./_components/SignalGrid";
 import { LiveFooterBlock } from "./_components/LiveFooterBlock";
-import { LandingNav } from "./_components/LandingNav";
-
-/* ─── Static ticker items (agent adds live tokens dynamically) ─ */
-const TICKER_ITEMS = [
-  { t: "AGENT",  p: "SCANNING…",      dir: "up"   as const, alert: false },
-  { t: "$BARK",  p: "-62.1%",         dir: "down" as const, alert: true  },
-  { t: "$PDOGE", p: "-12.4%",         dir: "down" as const, alert: false },
-  { t: "$VAPR",  p: "-28.0%",         dir: "down" as const, alert: true  },
-  { t: "#0412",  p: "MINTED",         dir: "up"   as const, alert: false },
-  { t: "$JEET",  p: "RESOLVED YES",   dir: "down" as const, alert: true  },
-  { t: "$GPEPE", p: "-44.6%",         dir: "down" as const, alert: true  },
-  { t: "$WGMI",  p: "+18.0%",         dir: "up"   as const, alert: false },
-  { t: "#0411",  p: "MINTED",         dir: "up"   as const, alert: false },
-  { t: "$NORM",  p: "RESOLVED NO",    dir: "up"   as const, alert: false },
-  { t: "AGENT",  p: "UPTIME 99.97%",  dir: "up"   as const, alert: false },
-  { t: "$BANA",  p: "+412%",          dir: "up"   as const, alert: false },
-];
-
+import { LandingNav, FloatingSectionNav } from "./_components/LandingNav";
 /* ─── Page ─────────────────────────────────────────────────── */
 
 export default function LandingPage() {
-  const tickerItems = [...TICKER_ITEMS, ...TICKER_ITEMS];
-
   return (
     <div data-page="landing">
+      <FloatingSectionNav />
 
-      {/* ══ FIRST FOLD — ticker + nav + hero = 100vh ════════ */}
+      {/* ══ FIRST FOLD — nav + hero = 100vh ════════════════ */}
       <div className="rj-fold">
-
-        {/* ── TOP TICKER ──────────────────────────────────── */}
-        <div className="rj-ticker" aria-hidden="true">
-          <div className="rj-ticker__track">
-            {tickerItems.map((item, i) => (
-              <span key={i}>
-                <span className={`rj-ticker__item${!item.alert ? " rj-ticker__item--safe" : ""}`}>
-                  <span className="rj-ticker__dot" />
-                  <span>{item.t}</span>
-                  <span className={`rj-ticker__pct--${item.dir === "up" ? "up" : "down"}`}>{item.p}</span>
-                </span>
-                <span className="rj-ticker__sep">·</span>
-              </span>
-            ))}
-          </div>
-        </div>
 
         {/* ── NAV — icons + app routes + wallet ───────────── */}
         <header className="rj-wrap">

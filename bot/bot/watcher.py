@@ -74,6 +74,9 @@ def decode_log(raw: dict) -> dict:
     }
 
 
+_BACKFILL_CHUNK = 2_000  # Arc RPC rejects ranges larger than ~5k; stay conservative
+
+
 async def backfill(
     w3: AsyncWeb3,
     registry: str,
@@ -85,30 +88,44 @@ async def backfill(
         return latest
 
     log.info("backfill_start", from_block=from_block, to_block=latest)
-    raw_logs = await w3.eth.get_logs(
-        {
-            "address": Web3.to_checksum_address(registry),
-            "topics": [MARKET_CREATED_TOPIC],
-            "fromBlock": from_block,
-            "toBlock": latest,
-        }
-    )
+    address = Web3.to_checksum_address(registry)
+    total = 0
+    chunk_start = from_block
 
-    for entry in raw_logs:
+    while chunk_start <= latest:
+        chunk_end = min(chunk_start + _BACKFILL_CHUNK - 1, latest)
         try:
-            decoded = decode_log(
+            raw_logs = await w3.eth.get_logs(
                 {
-                    "topics": [t.hex() for t in entry["topics"]],
-                    "data": entry["data"].hex(),
-                    "transactionHash": entry["transactionHash"],
-                    "blockNumber": entry["blockNumber"],
+                    "address": address,
+                    "topics": [MARKET_CREATED_TOPIC],
+                    "fromBlock": chunk_start,
+                    "toBlock": chunk_end,
                 }
             )
-            await callback(decoded)
         except Exception as exc:
-            log.error("backfill_decode_error", error=str(exc))
+            log.error("backfill_chunk_error", from_block=chunk_start, to_block=chunk_end, error=str(exc))
+            chunk_start = chunk_end + 1
+            continue
 
-    log.info("backfill_done", events=len(raw_logs))
+        for entry in raw_logs:
+            try:
+                decoded = decode_log(
+                    {
+                        "topics": [t.hex() for t in entry["topics"]],
+                        "data": entry["data"].hex(),
+                        "transactionHash": entry["transactionHash"],
+                        "blockNumber": entry["blockNumber"],
+                    }
+                )
+                await callback(decoded)
+            except Exception as exc:
+                log.error("backfill_decode_error", error=str(exc))
+
+        total += len(raw_logs)
+        chunk_start = chunk_end + 1
+
+    log.info("backfill_done", events=total)
     return latest
 
 

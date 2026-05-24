@@ -7,7 +7,7 @@ import {
   BinaryMarketAbi,
   formatUsdc,
 } from "./contracts";
-import { readContract, getBlock } from "viem/actions";
+import { readContract } from "viem/actions";
 
 export type MarketState = 0 | 1 | 2; // Open | Resolved | Cancelled
 
@@ -43,7 +43,7 @@ export interface MarketCreatedEvent {
   transactionHash: `0x${string}`;
 }
 
-const CACHE_KEY = "rugjeez:markets:v1";
+const CACHE_KEY = "rugjeez:markets:v2";
 
 function getCachedMarkets(): { block: string; markets: MarketCreatedEvent[] } | null {
   if (typeof window === "undefined") return null;
@@ -167,7 +167,63 @@ export async function getAllMarketEvents(): Promise<MarketCreatedEvent[]> {
 
   accumulated = [...accumulated, ...results];
   setCachedMarkets(latest, accumulated);
+
+  // Reconcile: registry is source of truth. Any address in getMarkets() not in
+  // event results (e.g. due to RPC log gaps) gets filled via getMarketDetail().
+  accumulated = await reconcileWithRegistry(accumulated, latest);
+
   return accumulated;
+}
+
+async function reconcileWithRegistry(
+  events: MarketCreatedEvent[],
+  latest: bigint,
+): Promise<MarketCreatedEvent[]> {
+  let allAddresses: `0x${string}`[];
+  try {
+    allAddresses = (await readContract(publicClient, {
+      address: MARKET_REGISTRY_ADDRESS,
+      abi: MarketRegistryAbi,
+      functionName: "getMarkets",
+    })) as `0x${string}`[];
+  } catch {
+    return events; // registry call failed — don't break the page
+  }
+
+  const known = new Set(events.map((m) => m.market.toLowerCase()));
+  const missing = allAddresses.filter((a) => !known.has(a.toLowerCase()));
+  if (missing.length === 0) return events;
+
+  const filled = await Promise.all(
+    missing.map(async (addr): Promise<MarketCreatedEvent | null> => {
+      try {
+        const d = await getMarketDetail(addr);
+        return {
+          market: d.address,
+          tokenId: d.tokenId,
+          tokenChain: d.tokenChain,
+          tokenSymbol: d.tokenSymbol,
+          baselinePrice: d.baselinePrice,
+          thresholdBps: d.thresholdBps,
+          resolvesAt: d.resolvesAt,
+          traceHash: d.traceHash,
+          yesPool: d.yesPool,
+          noPool: d.noPool,
+          blockNumber: 0n,
+          transactionHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+        };
+      } catch {
+        return null;
+      }
+    })
+  );
+
+  const merged = [
+    ...events,
+    ...(filled.filter(Boolean) as MarketCreatedEvent[]),
+  ];
+  setCachedMarkets(latest, merged);
+  return merged;
 }
 
 export async function getMarketDetail(address: `0x${string}`): Promise<MarketInfo> {

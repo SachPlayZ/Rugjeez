@@ -10,6 +10,7 @@ from typing import AsyncGenerator
 
 import aiohttp
 
+from agent import health as agent_health
 from agent.cache import cached
 from agent.logging import get_logger
 from agent.models import Signal
@@ -81,8 +82,13 @@ async def nfi_blacklist_collector(bus) -> AsyncGenerator[None, None]:
                 known = current
                 first_run = False
                 log.info("nfi_baseline", count=len(known), url=url)
+                agent_health.record_event("ok", f"nfi blacklist loaded · {len(known)} entries · watching for changes")
             else:
                 new_symbols = current - known
+                if new_symbols:
+                    agent_health.record_event("flag", f"nfi · {len(new_symbols)} new entr{'y' if len(new_symbols) == 1 else 'ies'}: {', '.join(sorted(new_symbols)[:4])}")
+                else:
+                    agent_health.record_event("scan", f"nfi check · {len(current)} entries · no new additions")
                 for sym in new_symbols:
                     log.info("nfi_new_entry", symbol=sym)
                     if sym not in symbol_map:
@@ -108,5 +114,6 @@ async def nfi_blacklist_collector(bus) -> AsyncGenerator[None, None]:
 
         except Exception as exc:
             log.error("nfi_collector_error", error=str(exc))
+            agent_health.record_event("err", f"nfi fetch failed · {str(exc)[:60]}")
 
         await asyncio.sleep(_POLL_INTERVAL)

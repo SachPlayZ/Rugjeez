@@ -133,6 +133,71 @@ function LandingWalletButton() {
   );
 }
 
+/* ── Floating left section nav ───────────────────────────── */
+
+export function FloatingSectionNav() {
+  return (
+    <>
+      <style>{`
+        .rj-fsn {
+          position: fixed;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 50;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          padding: 12px 0;
+        }
+        .rj-fsn__tab {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 48px;
+          height: 48px;
+          border-radius: 0 14px 14px 0;
+          background: rgba(31, 13, 25, 0.88);
+          border: 1px solid rgba(243, 195, 216, 0.22);
+          border-left: none;
+          color: #f3c3d8;
+          text-decoration: none;
+          backdrop-filter: blur(10px);
+          transform: translateX(-10px);
+          transition:
+            transform 0.2s cubic-bezier(.34,1.56,.64,1),
+            background 0.15s,
+            color 0.15s,
+            border-color 0.15s,
+            box-shadow 0.15s;
+        }
+        .rj-fsn__tab:hover {
+          transform: translateX(6px);
+          background: rgba(255, 95, 162, 0.18);
+          border-color: rgba(255, 95, 162, 0.55);
+          color: #fff5fa;
+          box-shadow: 3px 0 16px rgba(255, 95, 162, 0.25);
+        }
+        @media (max-width: 640px) { .rj-fsn { display: none; } }
+      `}</style>
+      <nav className="rj-fsn" aria-label="Page sections">
+        {SECTIONS.map(({ href, Icon, label }) => (
+          <Tooltip key={href}>
+            <TooltipTrigger
+              render={
+                <a href={href} className="rj-fsn__tab" aria-label={label} />
+              }
+            >
+              <Icon size={20} />
+            </TooltipTrigger>
+            <TooltipContent side="right">{label}</TooltipContent>
+          </Tooltip>
+        ))}
+      </nav>
+    </>
+  );
+}
+
 /* ── Nav ─────────────────────────────────────────────────── */
 
 export function LandingNav() {
@@ -147,30 +212,8 @@ export function LandingNav() {
         Rug<i>jeez</i><b>v0 · ARC TESTNET</b>
       </Link>
 
-      {/* Center: section icons + divider + app routes */}
+      {/* Center: app routes */}
       <div className="rj-nav__links" style={{ display: "flex", alignItems: "center", gap: 0 }}>
-        {/* Section icon links */}
-        {SECTIONS.map(({ href, Icon, label }) => (
-          <Tooltip key={href}>
-            <TooltipTrigger
-              render={
-                <a
-                  href={href}
-                  className="rj-nav__icon-btn"
-                  aria-label={label}
-                />
-              }
-            >
-              <Icon size={15} />
-            </TooltipTrigger>
-            <TooltipContent side="bottom">{label}</TooltipContent>
-          </Tooltip>
-        ))}
-
-        {/* Divider */}
-        <span className="rj-nav__sep" />
-
-        {/* App route text links */}
         {APP_ROUTES.map(({ href, label }) => (
           <Link
             key={href}

@@ -7,6 +7,7 @@ from typing import AsyncGenerator
 
 import aiohttp
 
+from agent import health as agent_health
 from agent.cache import cached
 from agent.logging import get_logger
 from agent.models import Signal
@@ -94,13 +95,17 @@ def add_to_watchlist(token_id: str, chain: str, symbol: str) -> None:
 
 async def price_anomaly_collector(bus) -> None:
     while True:
+        if not _watchlist:
+            agent_health.record_event("scan", "price watchlist · 0 tokens · waiting for signals")
         for token_id, (chain, symbol, window) in list(_watchlist.items()):
             try:
                 price = await get_price_usd(token_id, chain)
                 window.add(price)
                 drop = window.max_drop_fraction()
+                drop_pct = f"{drop * 100:.1f}%"
                 if drop >= _DROP_THRESHOLD:
                     severity = min(1.0, drop / 0.5)
+                    agent_health.record_event("flag", f"price · ${symbol} ${price:.6g} · -{drop_pct} in 1h window · signalling")
                     log.info("price_anomaly_detected", symbol=symbol, drop=round(drop, 3))
                     signal = Signal(
                         source="price_anomaly",
@@ -115,7 +120,10 @@ async def price_anomaly_collector(bus) -> None:
                         timestamp=int(time.time()),
                     )
                     await bus.publish(signal)
+                else:
+                    agent_health.record_event("scan", f"price · ${symbol} ${price:.6g} · -{drop_pct} in 1h window · ok")
             except Exception as exc:
                 log.warning("price_fetch_error", token=token_id, error=str(exc))
+                agent_health.record_event("err", f"price fetch · ${symbol} · {str(exc)[:50]}")
 
         await asyncio.sleep(_POLL_INTERVAL)

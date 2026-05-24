@@ -3,6 +3,7 @@ import { Instrument_Serif, Space_Grotesk, JetBrains_Mono } from "next/font/googl
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { WalletProvider } from "@/components/WalletConnect";
+import { LiveTicker } from "@/app/_components/LiveTicker";
 import "./globals.css";
 
 const instrumentSerif = Instrument_Serif({
@@ -48,6 +49,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <WalletProvider>
           <TooltipProvider>
+            <LiveTicker />
             {children}
             <Toaster position="bottom-right" richColors theme="dark" />
           </TooltipProvider>

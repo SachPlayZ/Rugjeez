@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from collections import deque
 from typing import Any
 
 _start_time = int(time.time())
@@ -12,6 +13,11 @@ _state: dict[str, Any] = {
     "errors_last_hour": 0,
 }
 _error_times: list[int] = []
+_events: deque[dict] = deque(maxlen=60)
+
+
+def record_event(act: str, rest: str) -> None:
+    _events.append({"time": _now_hms(), "act": act, "rest": rest})
 
 
 def record_signal() -> None:
@@ -40,9 +46,14 @@ def snapshot() -> dict:
     return {
         "status": "ok",
         "uptime_seconds": int(time.time()) - _start_time,
+        "recent_events": list(_events),
         **_state,
     }
 
 
 def _now_iso() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+
+def _now_hms() -> str:
+    return time.strftime("%H:%M:%S", time.gmtime())

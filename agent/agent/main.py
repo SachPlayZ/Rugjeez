@@ -59,10 +59,20 @@ async def _handle_signal(signal: Signal, chain: ChainClient) -> None:
     bucket.append(signal)
 
     score, contributing = score_token(bucket)
+    score_pct = int(score * 100)
     log.info("scored", signal_id=signal.id, score=round(score, 3))
 
     if score < THRESHOLD:
+        health.record_event(
+            "scan",
+            f"${signal.token_symbol} · score {score_pct} · from {signal.source} · below threshold",
+        )
         return
+
+    health.record_event(
+        "flag",
+        f"${signal.token_symbol} · score {score_pct} · threshold crossed · minting market…",
+    )
 
     # clear bucket so we don't re-trigger
     _pending_signals[signal.token_id] = []
@@ -72,17 +82,37 @@ async def _handle_signal(signal: Signal, chain: ChainClient) -> None:
         output = await reason(contributing, score, signal.id)
 
         if output.verdict != "open_market":
+            health.record_event("scan", f"${signal.token_symbol} · verdict={output.verdict} · no market")
             log.info("verdict_no_market", signal_id=signal.id, verdict=output.verdict)
             return
 
         market_addr = await execute(contributing, output, chain)
         health.record_mint(market_addr)
+        short = f"{market_addr[:10]}…{market_addr[-4:]}"
+        health.record_event("mint", f"market deployed → {short} · ${signal.token_symbol}")
         log.info("pipeline_complete", signal_id=signal.id, market=market_addr)
     except Exception as exc:
         health.record_error()
+        health.record_event("err", f"pipeline error · {str(exc)[:60]}")
         log.error("pipeline_error", signal_id=signal.id, error=str(exc))
     finally:
         health.set_in_flight(0)
+
+
+async def _heartbeat_loop() -> None:
+    await asyncio.sleep(5)  # let startup events land first
+    while True:
+        snap = health.snapshot()
+        uptime = snap["uptime_seconds"]
+        h, m = divmod(uptime // 60, 60)
+        uptime_str = f"{h}h {m}m" if h else f"{m}m {uptime % 60}s"
+        errors = snap.get("errors_last_hour", 0)
+        in_flight = snap.get("in_flight_mints", 0)
+        parts = [f"uptime {uptime_str}", f"{errors} errors/h"]
+        if in_flight:
+            parts.append(f"{in_flight} mint in-flight")
+        health.record_event("ok", "heartbeat · " + " · ".join(parts))
+        await asyncio.sleep(30)
 
 
 async def _agent_loop(bus: SignalBus, chain: ChainClient) -> None:
@@ -103,6 +133,8 @@ async def main() -> None:
     await state.init_db()
     await state.reconcile()
 
+    health.record_event("ok", "agent starting · db ready · collectors initialising")
+
     bus = SignalBus()
     chain = ChainClient()
 
@@ -116,11 +148,13 @@ async def main() -> None:
         rugjeez_blacklist_collector(bus),
     ]
     log.info("watching_collectors", count=len(collectors))
+    health.record_event("ok", f"agent ready · {len(collectors)} collectors active · threshold {THRESHOLD}")
 
     tasks = [
         asyncio.create_task(_agent_loop(bus, chain)),
         asyncio.create_task(resolver_loop(chain)),
         asyncio.create_task(_run_uvicorn()),
+        asyncio.create_task(_heartbeat_loop()),
     ]
     for collector in collectors:
         tasks.append(asyncio.create_task(collector))

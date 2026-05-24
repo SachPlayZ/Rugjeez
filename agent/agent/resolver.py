@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import time
 
+from agent import health as agent_health
 from agent.chain import ChainClient
 from agent.collectors.price_anomaly import get_price_usd
 from agent.logging import get_logger
@@ -61,6 +62,9 @@ async def _resolve_expired(chain: ChainClient) -> None:
                 yes=outcome_yes,
             )
             await chain.send_tx(contract.functions.resolve, outcome_yes)
+            short = f"{addr[:10]}…{addr[-4:]}"
+            outcome_str = "YES · token rugged" if outcome_yes else "NO · token survived"
+            agent_health.record_event("resolve", f"market {short} · {outcome_str} · drop {drop_bps}bps")
             resolved += 1
         except Exception as exc:
             log.error("resolve_market_error", address=addr, error=str(exc))
