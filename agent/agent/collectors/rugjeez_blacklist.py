@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import time
 from pathlib import Path
 from typing import AsyncGenerator
@@ -13,7 +14,7 @@ from agent.models import Signal
 
 log = get_logger(__name__)
 
-_POLL_INTERVAL = 30  # seconds — faster than NFI since this is our own repo
+_POLL_INTERVAL = 60  # seconds
 _SYMBOL_MAP_PATH = Path(__file__).parent.parent / "data" / "symbol_map.json"
 _BLACKLIST_URL = (
     "https://raw.githubusercontent.com/SachPlayZ/Rugjeez/main/configs/blacklist.json"
@@ -26,11 +27,19 @@ def _load_symbol_map() -> dict[str, dict]:
     return {}
 
 
+def _gh_headers() -> dict[str, str]:
+    token = os.getenv("GITHUB_TOKEN")
+    headers: dict[str, str] = {"Cache-Control": "no-cache"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
+
+
 async def _fetch_blacklist(session: aiohttp.ClientSession) -> list[str]:
     async with session.get(
         _BLACKLIST_URL,
         timeout=aiohttp.ClientTimeout(total=10),
-        headers={"Cache-Control": "no-cache"},
+        headers=_gh_headers(),
     ) as resp:
         resp.raise_for_status()
         data = json.loads(await resp.text())
