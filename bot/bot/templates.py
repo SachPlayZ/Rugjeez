@@ -42,7 +42,7 @@ def format_market_created(
     resolves_dt = datetime.datetime.utcfromtimestamp(resolves_at)
     resolves_str = resolves_dt.strftime("%b %d %H:%M UTC")
 
-    deep_link = f"{web_base_url.rstrip('/')}/market/{market_address}"
+    deep_link = f"{web_base_url.rstrip('/')}/m/{market_address}"
     trace_link = f"{explorer_url.rstrip('/')}/tx/{tx_hash}"
     demo_line = "\n🧪 demo mint" if is_demo else ""
 
