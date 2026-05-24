@@ -1,7 +1,13 @@
 import { MarketFilterChips } from "./_components/MarketFilterChips";
+import { LiveHeroStats } from "./_components/LiveHeroStats";
+import { LiveGauge } from "./_components/LiveGauge";
+import { LiveAgentLog } from "./_components/LiveAgentLog";
+import { LiveStatsBar } from "./_components/LiveStatsBar";
+import { LiveMarketTable } from "./_components/LiveMarketTable";
+import { SignalGrid } from "./_components/SignalGrid";
+import { LiveFooterBlock } from "./_components/LiveFooterBlock";
 
-/* ─── Static data ──────────────────────────────────────── */
-
+/* ─── Static ticker items (agent adds live tokens dynamically) ─ */
 const TICKER_ITEMS = [
   { t: "AGENT",  p: "SCANNING…",      dir: "up"   as const, alert: false },
   { t: "$BARK",  p: "-62.1%",         dir: "down" as const, alert: true  },
@@ -17,31 +23,10 @@ const TICKER_ITEMS = [
   { t: "$BANA",  p: "+412%",          dir: "up"   as const, alert: false },
 ];
 
-const LOG_LINES = [
-  { time: "12:04:31", act: "scan",    rest: <><span className="rj-hex">0xabc…7e21</span> · score <span className="rj-num">23</span> · below threshold</> },
-  { time: "12:04:32", act: "scan",    rest: <><span className="rj-hex">0x44ee…6cc3</span> · score <span className="rj-num">42</span> · below threshold</> },
-  { time: "12:04:33", act: "scan",    rest: <><span className="rj-hex">0xff10…3322</span> · score <span className="rj-num">8</span>  · below threshold</> },
-  { time: "12:04:34", act: "scan",    rest: <><span className="rj-hex">0x9088…ddc2</span> · score <span className="rj-num">31</span> · below threshold</> },
-  { time: "12:05:02", act: "flag",    rest: <><span className="rj-hex">0xdef0…1a4f</span> · score <span className="rj-neg">81</span> · minting market…</> },
-  { time: "12:05:04", act: "mint",    rest: <>market <span className="rj-hex">#0412</span> deployed at <span className="rj-hex">0x7a3c…d4f1</span></> },
-  { time: "12:05:05", act: "ok",      rest: <>IPFS trace pinned · <span className="rj-hex">bafy…r34d</span></> },
-  { time: "12:05:18", act: "scan",    rest: <><span className="rj-hex">0x12cd…e7f9</span> · score <span className="rj-num">14</span> · below threshold</> },
-  { time: "12:05:22", act: "scan",    rest: <><span className="rj-hex">0xaa01…0bbe</span> · score <span className="rj-num">52</span> · watch-listed</> },
-  { time: "12:05:41", act: "resolve", rest: <>market <span className="rj-hex">#0381</span> · YES wins · <span className="rj-num">$57,300</span> distributed</> },
-  { time: "12:05:42", act: "ok",      rest: <>oracle posted · <span className="rj-hex">price feed #0xchain.usdc</span></> },
-  { time: "12:05:58", act: "scan",    rest: <><span className="rj-hex">0x6bc3…11a0</span> · score <span className="rj-num">19</span> · below threshold</> },
-  { time: "12:06:17", act: "flag",    rest: <><span className="rj-hex">0xc02d…91be</span> · score <span className="rj-neg">83</span> · minting market…</> },
-  { time: "12:06:19", act: "mint",    rest: <>market <span className="rj-hex">#0410</span> deployed at <span className="rj-hex">0xc02d…91be</span></> },
-  { time: "12:06:20", act: "ok",      rest: <>IPFS trace pinned · <span className="rj-hex">bafy…m7q1</span></> },
-  { time: "12:06:34", act: "scan",    rest: <><span className="rj-hex">0x3b18…c0aa</span> · score <span className="rj-num">38</span> · below threshold</> },
-  { time: "12:06:51", act: "scan",    rest: <><span className="rj-hex">0xf12a…7820</span> · score <span className="rj-neg">66</span> · minting market…</> },
-  { time: "12:06:54", act: "mint",    rest: <>market <span className="rj-hex">#0411</span> deployed</> },
-];
-
-/* ─── Page ─────────────────────────────────────────────── */
+/* ─── Page ─────────────────────────────────────────────────── */
 
 export default function LandingPage() {
-  const tickerItems = [...TICKER_ITEMS, ...TICKER_ITEMS]; // duplicate for seamless loop
+  const tickerItems = [...TICKER_ITEMS, ...TICKER_ITEMS];
 
   return (
     <div data-page="landing">
@@ -104,65 +89,13 @@ export default function LandingPage() {
                 <a className="rj-btn rj-btn--ghost rj-btn--lg" href="#how">How it works</a>
                 <span className="rj-hint">USDC betting · 7-day settlement · open source</span>
               </div>
-              {/* TODO: wire to real contract stats */}
-              <div className="rj-hero__meta">
-                <div>
-                  <div className="rj-stat__num">412</div>
-                  <div className="rj-stat__lab">Markets minted</div>
-                </div>
-                <div>
-                  <div className="rj-stat__num rj-red">147</div>
-                  <div className="rj-stat__lab">Rugs confirmed</div>
-                </div>
-                <div>
-                  <div className="rj-stat__num">$48.2k</div>
-                  <div className="rj-stat__lab">USDC wagered</div>
-                </div>
-              </div>
+
+              {/* Live stats — fetched from on-chain */}
+              <LiveHeroStats />
             </div>
 
-            {/* Rug-o-meter gauge card — TODO: wire to most-recent-minted market */}
-            <aside className="rj-gauge">
-              <div className="rj-gauge__pin">
-                MARKET<br />MINTED<small>2 MIN AGO</small>
-              </div>
-              <div className="rj-gauge__head">
-                <span className="rj-gauge__title">
-                  <span className="rj-dot rj-dot--yellow" />Agent read · live
-                </span>
-                <span className="rj-gauge__live">
-                  <span className="rj-dot" />Streaming
-                </span>
-              </div>
-              <div className="rj-gauge__token">
-                <div className="rj-name">MOONBARK <span>$BARK · 4hr old</span></div>
-                <div className="rj-price">−62.4% / 24h</div>
-              </div>
-              <div className="rj-gauge__bar-wrap">
-                <div className="rj-gauge__bar">
-                  <div className="rj-gauge__bar-fill" />
-                </div>
-                <div className="rj-gauge__bar-marker" />
-                <div className="rj-gauge__bar-num">78<small>/100 risk</small></div>
-              </div>
-              <div className="rj-gauge__scale">
-                <span>Safe</span><span>Watch</span><span>Threshold ↑</span>
-              </div>
-              <div className="rj-gauge__verdict">
-                <div className="rj-verdict">&ldquo;Threshold crossed.&rdquo;</div>
-                <div className="rj-stake">Market <b>#0412</b> · 7d window</div>
-              </div>
-              <div className="rj-gauge__odds">
-                <button className="rj-odd rj-odd--rug">
-                  <span className="rj-lab">YES · loses &gt;50%</span>
-                  <span className="rj-num">0.78</span>
-                </button>
-                <button className="rj-odd rj-odd--safe">
-                  <span className="rj-lab">NO · holds value</span>
-                  <span className="rj-num">0.22</span>
-                </button>
-              </div>
-            </aside>
+            {/* Live gauge — shows latest minted market */}
+            <LiveGauge />
           </div>
         </div>
       </section>
@@ -269,54 +202,12 @@ export default function LandingPage() {
               <a className="rj-btn rj-btn--ghost" href="#">Read methodology →</a>
             </div>
           </div>
-          <div className="rj-signal-grid">
-            {[
-              { n: "01 / 07", w: "high",   name: <><em>NFI</em> blacklist</>,          desc: "Community-curated rug list of deployers and bytecode. Direct match → instant flag.",                 src: "Community",  val: "128k entries" },
-              { n: "02 / 07", w: "high",   name: <>Liquidity <em>lock</em></>,          desc: "Is the LP locked, vested, or removable? Unlocked pools are the strongest pre-rug signal.",          src: "On-chain",   val: "5 lockers"    },
-              { n: "03 / 07", w: "medium", name: <>Holder concentration</>,             desc: "Top 10 wallets' share of supply. Above 70% means a coordinated dump can drain the market.",         src: "On-chain",   val: "Top-10 %"     },
-              { n: "04 / 07", w: "high",   name: <>Deployer <em>history</em></>,        desc: "Has this wallet — or any wallet funding it within 3 hops — shipped a token that rugged before?",    src: "Indexer",    val: "3-hop graph"  },
-              { n: "05 / 07", w: "low",    name: <>Contract age</>,                     desc: "Most rugs happen in the first 72 hours; fresh contracts get a higher weight that decays.",            src: "On-chain",   val: "Hours"        },
-              { n: "06 / 07", w: "medium", name: <>Social <em>velocity</em></>,         desc: "Sudden mention spike with no product, audit, or builder behind it. Textbook rug precursor.",         src: "X · Telegram", val: "σ over baseline" },
-              { n: "07 / 07", w: "medium", name: <>Trading anomalies</>,                desc: "Wash trading, circular flow between linked wallets, bot-only volume that vanishes on cue.",           src: "On-chain",   val: "Pattern match" },
-            ].map((sig) => (
-              <article className="rj-signal" key={sig.n}>
-                <div className="rj-signal__head">
-                  <span className="rj-signal__num">{sig.n}</span>
-                  <span className={`rj-signal__weight${sig.w === "low" ? " rj-signal__weight--low" : sig.w === "high" ? " rj-signal__weight--high" : ""}`}>
-                    {sig.w === "low" ? "Low" : sig.w === "high" ? "High" : "Medium"}
-                  </span>
-                </div>
-                <div className="rj-signal__name">{sig.name}</div>
-                <p className="rj-signal__desc">{sig.desc}</p>
-                <div className="rj-signal__foot">
-                  <span>{sig.src}</span>
-                  <span className="rj-src">{sig.val}</span>
-                </div>
-              </article>
-            ))}
-            {/* Composite card */}
-            <article className="rj-signal" style={{ background: "linear-gradient(180deg,rgba(249,188,96,.06),var(--rj-ink))", borderColor: "rgba(249,188,96,.3)" }}>
-              <div className="rj-signal__head">
-                <span className="rj-signal__num">∑</span>
-                <span className="rj-signal__weight">Aggregated</span>
-              </div>
-              <div className="rj-signal__name" style={{ color: "var(--rj-yellow)" }}>
-                Composite <em style={{ color: "var(--rj-paper)" }}>score</em>
-              </div>
-              <p className="rj-signal__desc">
-                All seven signals normalized and weighted. Anything above <b style={{ color: "var(--rj-paper)" }}>65</b> auto-mints a market.
-              </p>
-              <div className="rj-signal__foot">
-                <span>Threshold</span>
-                <span className="rj-src" style={{ color: "var(--rj-yellow)" }}>≥ 65 / 100</span>
-              </div>
-            </article>
-          </div>
+          {/* Client component: same layout + shadcn tooltips on each card */}
+          <SignalGrid />
         </div>
       </section>
 
       {/* ── LIVE MARKETS ──────────────────────────────────── */}
-      {/* TODO: wire to real on-chain market data */}
       <section className="rj-section rj-intel" id="markets">
         <div className="rj-wrap">
           <div className="rj-section__head">
@@ -325,7 +216,7 @@ export default function LandingPage() {
               <h2 className="rj-h2">What the crowd thinks <span className="rj-it">right now.</span></h2>
             </div>
             <div className="rj-section__actions">
-              <a className="rj-btn rj-btn--ghost" href="/markets">All 412 markets →</a>
+              <a className="rj-btn rj-btn--ghost" href="/markets">All markets →</a>
             </div>
           </div>
           <MarketFilterChips />
@@ -340,85 +231,15 @@ export default function LandingPage() {
                 <span role="columnheader" style={{ textAlign: "right" }}>Time left</span>
                 <span role="columnheader"></span>
               </div>
-              {[
-                { name: "MOONBARK",    ticker: "$BARK",  addr: "0x7a3c…d4f1", market: "#0412", score: 78, yes: "$37,604",  no: "$10,606",  prob: "YES 0.78", probType: "yes", time: "6d 23h", pat: "zig",   bg: "#e16162", stripe: "rgba(0,30,29,.3)"  },
-                { name: "PUDGYDOGE",   ticker: "$PDOGE", addr: "0x1f8e…aa07", market: "#0411", score: 71, yes: "$91,164",  no: "$37,236",  prob: "YES 0.71", probType: "yes", time: "6d 22h", pat: "dots",  bg: "#f9bc60", stripe: "rgba(0,30,29,.5)"  },
-                { name: "VAPORFI",     ticker: "$VAPR",  addr: "0xc02d…91be", market: "#0410", score: 83, yes: "$252,403", no: "$51,697",  prob: "YES 0.83", probType: "yes", time: "6d 19h", pat: "check", bg: "#003532", stripe: "rgba(225,97,98,.55)"},
-                { name: "CHAD INU",    ticker: "$CHADI", addr: "0x44ee…6cc3", market: "#0409", score: 62, yes: "$38,998",  no: "$23,902",  prob: "NO 0.38",  probType: "no",  time: "5d 12h", pat: "",      bg: "#abd1c6", stripe: "rgba(0,30,29,.35)" },
-                { name: "GIGAPEPE",    ticker: "$GPEPE", addr: "0xf12a…7820", market: "#0408", score: 66, yes: "$120,582", no: "$62,118",  prob: "YES 0.66", probType: "yes", time: "4d 03h", pat: "zig",   bg: "#001e1d", stripe: "rgba(249,188,96,.6)"},
-                { name: "SAFEROCKET",  ticker: "$SROCK", addr: "0x8c91…ff2d", market: "#0407", score: 54, yes: "$23,296",  no: "$21,504",  prob: "NO 0.48",  probType: "no",  time: "2d 18h", pat: "dots",  bg: "#e16162", stripe: "rgba(255,255,255,.45)"},
-              ].map((row) => (
-                <div className="rj-rugtable__row" role="row" key={row.market}>
-                  <div className="rj-rugtable__token" role="cell">
-                    <div
-                      className="rj-swatch"
-                      data-pattern={row.pat || undefined}
-                      style={{ width: 38, height: 38, ["--swatch-bg" as string]: row.bg, ["--swatch-stripe" as string]: row.stripe }}
-                    />
-                    <div>
-                      <div className="rj-t">{row.name} <small>{row.ticker}</small></div>
-                      <div className="rj-meta rj-mono">{row.addr} · {row.market}</div>
-                    </div>
-                  </div>
-                  <div className="rj-rugtable__score" role="cell">
-                    <div className="rj-risk-bar">
-                      <div className="rj-risk-bar__fill" style={{ ["--w" as string]: `${row.score}%` }} />
-                    </div>
-                    <span className={`rj-risk-num ${row.score >= 70 ? "rj-red" : "rj-yellow"}`}>{row.score}</span>
-                  </div>
-                  <div role="cell" className="rj-mono">{row.yes}</div>
-                  <div role="cell" className="rj-mono">{row.no}</div>
-                  <div role="cell">
-                    <span className={`rj-outcome rj-outcome--${row.probType}`}>{row.prob}</span>
-                  </div>
-                  <div role="cell" className="rj-muted">{row.time}</div>
-                  <div role="cell"><a className="rj-cta" href="/markets">Trade →</a></div>
-                </div>
-              ))}
+              {/* Live market rows — falls back to demo data if no on-chain markets */}
+              <LiveMarketTable />
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── GLOBAL STATS BAR ──────────────────────────────── */}
-      {/* TODO: wire to real contract stats */}
-      <section className="rj-stats" id="stats">
-        <div className="rj-wrap">
-          <div className="rj-stats__grid">
-            {[
-              { n: "412",  l: "Markets minted" },
-              { n: "$48k", l: "USDC wagered",  italic: true },
-              { n: "147",  l: "Rugs confirmed" },
-              { n: "94%",  l: "Agent accuracy", italic: true },
-              { n: "198",  l: "Open right now" },
-            ].map((item) => (
-              <div key={item.l}>
-                <div className="rj-stats__n">
-                  {item.italic
-                    ? <>{item.n.replace(/[k%]/g, "")}<i>{item.n.match(/[k%]/)?.[0]}</i></>
-                    : item.n}
-                </div>
-                <div className="rj-stats__l">{item.l}</div>
-              </div>
-            ))}
-          </div>
-          <div className="rj-split">
-            <div className="rj-split__bar">
-              <div className="rj-split__yes" style={{ width: "68.7%" }}>
-                <span>YES · rugged</span>
-                <span>147 · 68.7%</span>
-              </div>
-              <div className="rj-split__no" style={{ width: "31.3%" }}>
-                <span>NO · safe</span>
-                <span>67 · 31.3%</span>
-              </div>
-            </div>
-            <div className="rj-split__note">
-              214 resolved markets · 198 open · agent accuracy = % of YES-majority pools that resolved YES
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── GLOBAL STATS BAR — live on-chain numbers ──────── */}
+      <LiveStatsBar />
 
       {/* ── RECENT RESOLUTIONS ────────────────────────────── */}
       <section className="rj-section rj-resolutions" id="resolutions">
@@ -489,7 +310,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── AGENT ACTIVITY LOG ────────────────────────────── */}
+      {/* ── AGENT ACTIVITY LOG — live terminal ────────────── */}
       <section className="rj-section rj-agentlog" id="agent">
         <div className="rj-wrap">
           <div className="rj-section__head">
@@ -501,23 +322,8 @@ export default function LandingPage() {
               <a className="rj-btn rj-btn--ghost" href="#">Full log API →</a>
             </div>
           </div>
-          <div className="rj-term">
-            <div className="rj-term__head">
-              <div className="rj-term__dots"><span /><span /><span /></div>
-              <div>rugjeez-agent@arc-testnet:~ · last 120 events</div>
-              <div className="rj-term__pulse">LIVE · uptime 99.97%</div>
-            </div>
-            <div className="rj-term__body">
-              {LOG_LINES.map((line, i) => (
-                <div className="rj-term__line" key={i}>
-                  <span className="rj-term__time">[{line.time}]</span>
-                  <span className={`rj-term__action ${line.act}`}>{line.act.toUpperCase()}</span>
-                  <span className="rj-term__rest">{line.rest}</span>
-                </div>
-              ))}
-              <div className="rj-term__line"><span className="rj-cursor" /></div>
-            </div>
-          </div>
+          {/* Live terminal with real agent health + animated demo lines */}
+          <LiveAgentLog />
         </div>
       </section>
 
@@ -589,7 +395,7 @@ export default function LandingPage() {
                 Every agent decision pinned to IPFS and referenced on-chain. <b>Publicly verifiable</b>, not a black box.
               </p>
               <div className="rj-built-card__meta">
-                <span>Pinned</span><span><b>412 / 412 markets</b></span>
+                <span>Pinned</span><span><b>all markets</b></span>
               </div>
             </article>
           </div>
@@ -655,16 +461,16 @@ export default function LandingPage() {
             <div className="rj-foot__col">
               <h5>On-chain</h5>
               <span className="rj-addr-lab">Agent wallet</span>
-              <span className="rj-addr">0xag3n7…4f1d</span>
+              <span className="rj-addr">0xe34b40f38217f9Dc8c3534735f7f41B2cDA73A75</span>
               <span className="rj-addr-lab">Market factory</span>
-              <span className="rj-addr">0xfac…0412</span>
+              <span className="rj-addr">0xa1Db4fBe80E7064E8bC70b6138a11572cFE1f79b</span>
               <span className="rj-addr-lab">USDC</span>
-              <span className="rj-addr">0x3600000000…</span>
+              <span className="rj-addr">0x3600000000000000000000000000000000000000</span>
             </div>
           </div>
           <div className="rj-foot__bottom">
             <span className="rj-legal">© 2026 Rugjeez · Testnet only · Not financial advice · 18+ where lawful</span>
-            <span className="rj-legal">v0.1.4 · agent uptime 99.97% · last block 4,182,394</span>
+            <LiveFooterBlock />
           </div>
         </div>
       </footer>
