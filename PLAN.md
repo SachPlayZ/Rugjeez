@@ -311,7 +311,7 @@ Four planes:
 | 2 | `agent/` — Python agent + collectors | `complete` | 1 |
 | 3 | `agent/demo` — manual signal injection endpoint | `complete` | 2 |
 | 4 | `web/` — Next.js frontend | `complete` | 1 (and 2 for live data) |
-| 5 | `web/demo` — demo trigger button UI | `in_progress` | 3, 4 |
+| 5 | `web/demo` — demo trigger button UI | `complete` | 3, 4 |
 | 6 | `bot/` — Twitter/Telegram poster | `not_started` | 1 |
 | 7 | `infra/` — deploy + run scripts | `not_started` | all |
 | 8 | `submission` — video, README, form | `not_started` | all |
@@ -773,7 +773,7 @@ web/
 
 # Module 5 — `web/demo` — demo trigger UI
 
-**Status:** `not_started` · **Depends on:** Module 3, Module 4
+**Status:** `complete` · **Depends on:** Module 3, Module 4
 
 **Purpose.** The demo button page. One-click triggers a real-feeling market mint from a real NFI blacklist addition, for the demo video and live demos to investors/judges.
 
@@ -817,17 +817,24 @@ web/src/app/demo/
 - Honesty footer is present and clear
 
 ### Cross-cutting checklist
-- [ ] Page is mobile-responsive (this URL gets shared on phones)
-- [ ] Uses `NEXT_PUBLIC_DEMO_API_SECRET` for the obscured demo endpoint path
-- [ ] Error boundary around the candidate grid (one broken candidate doesn't kill the page)
-- [ ] Loading and error states for the candidates fetch
-- [ ] `ThinkingPanel` choreography is at least 6 seconds (real reasoning takes 5-8s; matches reality)
+- [x] Page is mobile-responsive (this URL gets shared on phones)
+- [x] Uses `NEXT_PUBLIC_DEMO_API_SECRET` for the obscured demo endpoint path
+- [x] Error boundary around the candidate grid (one broken candidate doesn't kill the page)
+- [x] Loading and error states for the candidates fetch
+- [x] `ThinkingPanel` choreography is at least 6 seconds (10 steps × 700ms = 7s)
 
 ### Handoff (filled when complete)
-- Demo page URL:
+- Demo page URL: `/demo` (local: http://localhost:3000/demo)
+- `ThinkingPanel` and `CandidateCard` extracted to `web/src/app/demo/components/`
+- `ErrorBoundary` reusable component at `web/src/components/ErrorBoundary.tsx`
 
 ### Notes (filled when complete)
-*To be filled by Claude when module marked complete.*
+- `ThinkingPanel` uses a progress bar + step list; 10 steps × 700ms = 7s total choreography.
+- `watchNewMarkets` subscription is set up BEFORE the POST so no race condition on fast mints.
+- Abort controller used on fetch for candidates — safe unmount.
+- Error boundary wraps entire candidate grid; one broken render won't crash the page.
+- Cancel button shown during minting (clears state, unsubscribes WSS watcher).
+- Honesty footer present as italic muted text at page bottom.
 
 ---
 
