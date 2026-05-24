@@ -313,7 +313,7 @@ Four planes:
 | 4 | `web/` — Next.js frontend | `complete` | 1 (and 2 for live data) |
 | 5 | `web/demo` — demo trigger button UI | `complete` | 3, 4 |
 | 6 | `bot/` — Twitter/Telegram poster | `complete` | 1 |
-| 7 | `infra/` — deploy + run scripts | `not_started` | all |
+| 7 | `infra/` — deploy + run scripts | `in_progress` | all |
 | 8 | `submission` — video, README, form | `not_started` | all |
 
 **Status values:** `not_started` | `in_progress` | `complete` | `blocked` | `skipped`
@@ -910,7 +910,7 @@ bot/
 
 # Module 7 — `infra/` — deploy + run scripts
 
-**Status:** `not_started` · **Depends on:** all
+**Status:** `in_progress` · **Depends on:** all
 
 **Purpose.** One-shot deploy and run for the demo.
 
