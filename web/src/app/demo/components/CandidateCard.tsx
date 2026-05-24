@@ -24,10 +24,10 @@ const CHAIN_LABELS: Record<string, string> = {
 };
 
 const CHAIN_COLORS: Record<string, string> = {
-  bsc: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-  solana: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-  ethereum: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  base: "bg-blue-600/10 text-blue-400 border-blue-600/20",
+  bsc:      "border",
+  solana:   "border",
+  ethereum: "border",
+  base:     "border",
 };
 
 interface CandidateCardProps {

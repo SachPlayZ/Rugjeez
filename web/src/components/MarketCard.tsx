@@ -33,10 +33,10 @@ const CHAIN_LABELS: Record<string, string> = {
 };
 
 const CHAIN_COLORS: Record<string, string> = {
-  bsc: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-  solana: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-  ethereum: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  base: "bg-blue-600/10 text-blue-400 border-blue-600/20",
+  bsc:      "border",
+  solana:   "border",
+  ethereum: "border",
+  base:     "border",
 };
 
 function StatePill({
@@ -93,15 +93,16 @@ export function MarketCard({
     <Link href={`/m/${event.market}`} className="block group">
       <Card
         className={cn(
-          "transition-all duration-200 border-border/60 bg-card hover:bg-card/80 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5",
-          !isOpen && "opacity-70",
+          "transition-all duration-200 border-border/60 bg-card hover:border-primary/40 hover:shadow-lg hover:-translate-y-0.5",
+          !isOpen && "opacity-60",
           className
         )}
+        style={{ transitionProperty: "transform, border-color, box-shadow" }}
       >
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
-              <CardTitle className="font-heading text-lg tracking-tight truncate">
+              <CardTitle className="font-heading text-xl tracking-tight truncate" style={{ fontFamily: "var(--font-instrument-serif), serif", fontWeight: 400 }}>
                 ${event.tokenSymbol}
               </CardTitle>
               <Badge
