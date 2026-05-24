@@ -9,7 +9,6 @@ const NAV_ITEMS = [
   { href: "/markets", label: "Markets" },
   { href: "/history", label: "History" },
   { href: "/agent",   label: "Agent"   },
-  { href: "/demo",    label: "Demo"    },
 ];
 
 export function Navbar() {

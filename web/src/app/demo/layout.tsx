@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { DemoGate } from "./DemoGate";
+
 export default function DemoLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return <DemoGate>{children}</DemoGate>;
 }
