@@ -8,14 +8,14 @@ export const metadata: Metadata = {
     title: "Resolution History · Rugjeez",
     description:
       "On-chain track record of every Rugjeez prediction market — rugged, survived, and crowd pricing.",
-    images: [{ url: "/rugjeez-banner.png", width: 1200, height: 630 }],
+    images: [{ url: "/rugjeez-og-v2.png", width: 1200, height: 400 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Resolution History · Rugjeez",
     description:
       "On-chain track record of every Rugjeez prediction market — rugged, survived, and crowd pricing.",
-    images: ["/rugjeez-banner.png"],
+    images: ["/rugjeez-og-v2.png"],
   },
 };
 

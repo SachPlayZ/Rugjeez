@@ -8,14 +8,14 @@ export const metadata: Metadata = {
     title: "Live Markets · Rugjeez",
     description:
       "Browse all open and resolved AI-minted rug-detection markets on Arc Testnet.",
-    images: [{ url: "/rugjeez-banner.png", width: 1200, height: 630 }],
+    images: [{ url: "/rugjeez-og-v2.png", width: 1200, height: 400 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Live Markets · Rugjeez",
     description:
       "Browse all open and resolved AI-minted rug-detection markets on Arc Testnet.",
-    images: ["/rugjeez-banner.png"],
+    images: ["/rugjeez-og-v2.png"],
   },
 };
 
