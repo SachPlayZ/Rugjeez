@@ -668,7 +668,7 @@ agent/agent/
 
 **Purpose.** Where users see markets, place bets, view reasoning. The traction surface.
 
-**Stack.** Next.js 14 App Router, TypeScript, Tailwind, **viem** (not ethers), Circle Modular Wallets SDK, Circle Paymaster.
+**Stack.** Next.js 16 App Router, TypeScript, Tailwind, **viem** (not ethers), Circle Modular Wallets SDK, Circle Paymaster.
 
 ### Pages
 

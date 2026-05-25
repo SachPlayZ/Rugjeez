@@ -86,7 +86,7 @@ These are the values you will use everywhere. Do not look them up again.
 ├── README.md         # User-facing README (write near submission time)
 ├── contracts/        # Module 1 — Foundry, Solidity 0.8.24
 ├── agent/            # Modules 2 + 3 — Python 3.11+, agent + demo API
-├── web/              # Modules 4 + 5 — Next.js 14, TypeScript, viem
+├── web/              # Modules 4 + 5 — Next.js 16, TypeScript, viem
 ├── bot/              # Module 6 — Python, Telegram/Twitter poster
 └── infra/            # Module 7 — Makefile + deploy scripts
 ```
@@ -123,7 +123,7 @@ These are the values you will use everywhere. Do not look them up again.
 
 ### TypeScript (`web/`)
 
-- Next.js 14 App Router. Not Pages Router.
+- Next.js 16 App Router. Not Pages Router.
 - **viem**, not ethers. Smaller, faster, matches Arc docs examples.
 - Tailwind. No CSS modules, no styled-components.
 - `tsconfig` strict mode on.
