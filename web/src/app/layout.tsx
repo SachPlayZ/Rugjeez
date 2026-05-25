@@ -32,13 +32,13 @@ const siteUrl =
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Rugjeez — AI Prediction Markets",
+    default: "Rugjeez - Rug Pull Prediction Markets",
     template: "%s · Rugjeez",
   },
   description:
     "Autonomous AI agent on Arc that mints binary prediction markets when rug signals cross threshold. Bet USDC on whether flagged tokens will collapse.",
   openGraph: {
-    title: "Rugjeez — AI Prediction Markets",
+    title: "Rugjeez - Rug Pull Prediction Markets",
     description: "Autonomous prediction markets powered by AI rug detection.",
     type: "website",
     url: siteUrl,
@@ -48,13 +48,13 @@ export const metadata: Metadata = {
         url: "/rugjeez-banner.png",
         width: 1200,
         height: 630,
-        alt: "Rugjeez — AI Prediction Markets",
+        alt: "Rugjeez - Rug Pull Prediction Markets",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rugjeez — AI Prediction Markets",
+    title: "Rugjeez - Rug Pull Prediction Markets",
     description: "Autonomous prediction markets powered by AI rug detection.",
     images: ["/rugjeez-banner.png"],
   },
