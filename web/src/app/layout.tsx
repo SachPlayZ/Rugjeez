@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     siteName: "Rugjeez",
     images: [
       {
-        url: "/Rugjeez Banner.png",
+        url: "/rugjeez-banner.png",
         width: 1200,
         height: 630,
         alt: "Rugjeez — AI Prediction Markets",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Rugjeez — AI Prediction Markets",
     description: "Autonomous prediction markets powered by AI rug detection.",
-    images: ["/Rugjeez Banner.png"],
+    images: ["/rugjeez-banner.png"],
   },
   icons: {
     icon: [
