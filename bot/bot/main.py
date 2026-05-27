@@ -73,7 +73,20 @@ async def _handle(event: dict, w3: AsyncWeb3) -> None:
 
     posted = False
     if TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID:
-        posted = await tg_post(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, msg)
+        for attempt in range(3):
+            posted = await tg_post(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, msg)
+            if posted:
+                break
+            if attempt < 2:
+                delay = 2**attempt  # 1 s, then 2 s
+                bound.warning("telegram_retry", attempt=attempt + 1, retry_in_s=delay)
+                await asyncio.sleep(delay)
+        if not posted:
+            bound.error(
+                "telegram_post_failed_all_attempts",
+                market=market,
+                note="market will be retried on next bot restart via backfill",
+            )
     else:
         bound.warning("telegram_not_configured_marking_handled")
         posted = True

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import signal
 
 import uvicorn
 from dotenv import load_dotenv
@@ -159,7 +160,31 @@ async def main() -> None:
     for collector in collectors:
         tasks.append(asyncio.create_task(collector))
 
-    await asyncio.gather(*tasks)
+    shutdown = asyncio.Event()
+    loop = asyncio.get_running_loop()
+    for sig in (signal.SIGTERM, signal.SIGINT):
+        loop.add_signal_handler(sig, shutdown.set)
+
+    # Run until a task crashes or shutdown signal arrives
+    shutdown_task = asyncio.create_task(shutdown.wait())
+    done, _ = await asyncio.wait(
+        [shutdown_task, *tasks],
+        return_when=asyncio.FIRST_COMPLETED,
+    )
+
+    if shutdown_task in done:
+        log.info("shutdown_signal_received")
+        health.record_event("ok", "shutdown signal · draining in-flight mints…")
+        # Wait up to 30 s for any in-flight mint to finish
+        for _ in range(30):
+            if health.snapshot().get("in_flight_mints", 0) == 0:
+                break
+            await asyncio.sleep(1)
+
+    for task in tasks:
+        task.cancel()
+    await asyncio.gather(*tasks, return_exceptions=True)
+    log.info("shutdown_complete")
 
 
 if __name__ == "__main__":

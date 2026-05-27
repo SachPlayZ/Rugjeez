@@ -21,7 +21,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { explorerAddress, EXPLORER_URL } from "@/lib/arc";
-import { TRACE_REGISTRY_ADDRESS } from "@/lib/contracts";
+import { TRACE_REGISTRY_ADDRESS, AGENT_ADDRESS } from "@/lib/contracts";
+import { verifyMessage } from "viem";
 
 interface TraceViewerProps {
   ipfsCid: string;
@@ -77,6 +78,19 @@ export function TraceViewer({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [verifyOpen, setVerifyOpen] = useState(false);
+  const [sigStatus, setSigStatus] = useState<"idle" | "verifying" | "valid" | "invalid">("idle");
+
+  useEffect(() => {
+    if (!verifyOpen || !agentSignature || sigStatus !== "idle") return;
+    setSigStatus("verifying");
+    verifyMessage({
+      address: AGENT_ADDRESS,
+      message: { raw: traceHash },
+      signature: agentSignature,
+    })
+      .then((valid) => setSigStatus(valid ? "valid" : "invalid"))
+      .catch(() => setSigStatus("invalid"));
+  }, [verifyOpen, agentSignature, traceHash, sigStatus]);
 
   useEffect(() => {
     setLoading(true);
@@ -248,9 +262,24 @@ export function TraceViewer({
             </div>
             {agentSignature && (
               <div className="flex flex-col gap-1">
-                <span className="text-muted-foreground font-semibold">Agent Signature</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground font-semibold">Agent Signature</span>
+                  {sigStatus === "verifying" && (
+                    <span className="text-muted-foreground text-xs">verifying…</span>
+                  )}
+                  {sigStatus === "valid" && (
+                    <span className="flex items-center gap-1 text-no text-xs font-semibold">
+                      <CheckCircle2 className="size-3" /> Valid
+                    </span>
+                  )}
+                  {sigStatus === "invalid" && (
+                    <span className="flex items-center gap-1 text-yes text-xs font-semibold">
+                      <AlertTriangle className="size-3" /> Invalid
+                    </span>
+                  )}
+                </div>
                 <span className="font-mono text-foreground/80 break-all">
-                  {agentSignature.slice(0, 66)}...
+                  {agentSignature.slice(0, 66)}…
                 </span>
               </div>
             )}

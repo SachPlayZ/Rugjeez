@@ -48,9 +48,21 @@ async def _resolve_expired(chain: ChainClient) -> None:
             threshold_bps: int = await chain.call(contract.functions.thresholdBps().call)
 
             token_id_str = _decode_token_id(token_id_raw, token_chain)
-            current_price = await get_price_usd(token_id_str, token_chain)
-            current_8dec = int(current_price * 10**8)
 
+            # Fetch current price. If unavailable, skip this market and retry next
+            # poll — never assume an outcome from missing data.
+            try:
+                current_price = await get_price_usd(token_id_str, token_chain)
+            except Exception as price_exc:
+                log.warning(
+                    "resolve_price_unavailable_skipping",
+                    address=addr,
+                    token_id=token_id_str,
+                    error=str(price_exc),
+                )
+                continue
+
+            current_8dec = int(current_price * 10**8)
             drop_bps = int((baseline - current_8dec) * 10000 / baseline) if baseline > 0 else 0
             outcome_yes = drop_bps >= threshold_bps
 

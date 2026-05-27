@@ -136,7 +136,7 @@
     "chain": "bsc"
   },
   "SKYAI": {
-    "token_id": "0x2dA89f5EBE8F92Bc97f6B7e8B1DC6FD72C8cB1f3",
+    "token_id": "0x92aa03137385f18539301349dcfc9ebc923ffb10",
     "chain": "bsc"
   },
   "CES": {
@@ -186,5 +186,105 @@
   "WAT": {
     "token_id": "0x6B9c1E3A5D7B9c1E5F3A7D9B2c4E6A8D0F2B4c6E",
     "chain": "bsc"
+  },
+  "LOOKS": {
+    "token_id": "0xf4d2888d29D722226FafA5d9B24F9164c092421E",
+    "chain": "ethereum"
+  },
+  "MASK": {
+    "token_id": "0x69af81e73A73B40adF4f3d4223Cd9b1ECE623074",
+    "chain": "ethereum"
+  },
+  "SAITAMA": {
+    "token_id": "0x8b3192f5eebd8579568a2ed41e6feb402f93f73f",
+    "chain": "ethereum"
+  },
+  "LEASH": {
+    "token_id": "0x27C70Cd1946795B66be9d954418546998b546634",
+    "chain": "ethereum"
+  },
+  "BONE": {
+    "token_id": "0x9813037ee2218799597d83D4a5B6F3b6778218d9",
+    "chain": "ethereum"
+  },
+  "MBOX": {
+    "token_id": "0x3203c9E46cA618C8C1cE5dC67e7e9D75a7B1622b",
+    "chain": "bsc"
+  },
+  "SFUND": {
+    "token_id": "0x477bC8d23c634C154061869478bce96BE6045D12",
+    "chain": "bsc"
+  },
+  "ALPHA": {
+    "token_id": "0xa1faa113cbE53436Df28FF0aEe54275c13B40975",
+    "chain": "bsc"
+  },
+  "REEF": {
+    "token_id": "0xf21768ccbc73Ea5B6fd3C687208a7c2def2d966e",
+    "chain": "bsc"
+  },
+  "DODO": {
+    "token_id": "0x67ee3Cb086F8a16f34beE3ca72FAD36F7Db929e2",
+    "chain": "bsc"
+  },
+  "EPS": {
+    "token_id": "0xA7f552078dcC247C2684336020c03648500C6d9F",
+    "chain": "bsc"
+  },
+  "HERO": {
+    "token_id": "0xD40bEDb44C081D2935eebA6eF5a3c8A31A1bBE13",
+    "chain": "bsc"
+  },
+  "HIGH": {
+    "token_id": "0x5f4bde007dc06b867f86ebfe4802e2cf07a2d964",
+    "chain": "bsc"
+  },
+  "PMON": {
+    "token_id": "0x1796ae0b0fa4862485106a0de9b654eFE301D0b2",
+    "chain": "bsc"
+  },
+  "WOM": {
+    "token_id": "0xAD6742A35fB341A9Cc6ad674738Dd8da98b94Fb1",
+    "chain": "bsc"
+  },
+  "SPELL": {
+    "token_id": "0x9Fe9D260262331807D84175Cf79d5d45c22A7b21",
+    "chain": "bsc"
+  },
+  "MARSH": {
+    "token_id": "0x2FA5dAF6Fe0708fBD63b1A7D1592577284f52256",
+    "chain": "bsc"
+  },
+  "NULS": {
+    "token_id": "0x8CD6e29d3686d24d3C2018CEe54621eA0f89313B",
+    "chain": "bsc"
+  },
+  "TLM": {
+    "token_id": "0x2222227E22102Fe3322098e4CBfE18cFebD57c95",
+    "chain": "bsc"
+  },
+  "ACH": {
+    "token_id": "0xBc7d6B50616989655AfD682fb42743507003056D",
+    "chain": "bsc"
+  },
+  "MOODENG": {
+    "token_id": "ED5nyyWEzpPPiWimP8vYm7sD7TD3LAt3Q3gRTWHzc5MC",
+    "chain": "solana"
+  },
+  "PNUT": {
+    "token_id": "2qEHjDLDLbuBgRYvsxhc5D6uDWAivNFZGan56P1tpump",
+    "chain": "solana"
+  },
+  "FARTCOIN": {
+    "token_id": "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump",
+    "chain": "solana"
+  },
+  "WEN": {
+    "token_id": "WENWENvqqNya429ubCdR81ZmD69brwQaaBYY6p3LCpk",
+    "chain": "solana"
+  },
+  "AI16Z": {
+    "token_id": "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC",
+    "chain": "solana"
   }
 }

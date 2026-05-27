@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import time
 
 from eth_account.messages import encode_defunct
@@ -14,6 +15,7 @@ from agent.reasoner import canonicalize, trace_hash
 log = get_logger(__name__)
 
 _USDC_DECIMALS = 6
+_ZERO_ADDRESS = "0x" + "0" * 40
 
 
 async def execute(
@@ -24,6 +26,12 @@ async def execute(
     """Pin trace, mint market, record trace on-chain. Returns market address."""
     signal_id = output.signal_id
     primary = signals[0]
+
+    # Reject placeholder token IDs before doing any expensive work.
+    if primary.token_id.lower() == _ZERO_ADDRESS:
+        raise ValueError(
+            f"Refusing to mint: placeholder token_id for {primary.token_symbol}"
+        )
 
     await state.create_mint(signal_id, primary.token_id)
     bound = log.bind(signal_id=signal_id, token=primary.token_symbol)
@@ -122,14 +130,26 @@ async def execute(
 
 
 async def _get_baseline_price(signal: Signal, chain: ChainClient) -> int:
-    """Return 8-decimal USD price. Fetches from DEX or falls back to 1 USD."""
+    """Return 8-decimal USD price. Retries 3× at 5 s intervals before raising.
+
+    Never falls back to a fake price — a market with a wrong baseline produces
+    wrong resolution outcomes, which is worse than not minting at all.
+    """
     from agent.collectors.price_anomaly import get_price_usd
 
-    try:
-        price = await get_price_usd(signal.token_id, signal.token_chain)
-        return int(price * 10**8)
-    except Exception:
-        return 1 * 10**8  # fallback: 1 USD
+    last_exc: Exception | None = None
+    for attempt in range(3):
+        try:
+            price = await get_price_usd(signal.token_id, signal.token_chain)
+            return int(price * 10**8)
+        except Exception as exc:
+            last_exc = exc
+            if attempt < 2:
+                await asyncio.sleep(5)
+    raise RuntimeError(
+        f"Baseline price unavailable for {signal.token_symbol} ({signal.token_id})"
+        " after 3 attempts — mint aborted"
+    ) from last_exc
 
 
 def _token_id_bytes(token_id: str) -> bytes:

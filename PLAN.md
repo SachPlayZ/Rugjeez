@@ -894,8 +894,9 @@ bot/
 - [x] Idempotent: posting twice for the same `MarketCreated` event is detected and skipped (track posted market addresses in a small SQLite or even a flat file)
 
 ### Handoff (filled when complete)
-- Telegram channel link: set `TELEGRAM_CHAT_ID` after @BotFather setup (not yet deployed)
-- Bot deployment host: local for now; `python -m bot.main` or `rugoracle-bot` script
+- Telegram channel: deployed and posting live (see rugjeez.vercel.app links in posts)
+- Web URL in posts: `https://rugjeez.vercel.app/m/<address>`
+- Bot deployment host: running (local or persistent process)
 
 ### Notes (filled when complete)
 - WSS subscription uses raw `websockets` lib for full reconnect control; HTTP `AsyncWeb3` used for `getTrace` reads and backfill `eth_getLogs`.

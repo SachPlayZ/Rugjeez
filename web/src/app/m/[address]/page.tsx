@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getMarketDetail, timeUntil, type MarketInfo } from "@/lib/markets";
 import { formatUsdc, TRACE_REGISTRY_ADDRESS, TraceRegistryAbi } from "@/lib/contracts";
+import { CancelRefundPanel } from "@/components/CancelRefundPanel";
 import { publicClient } from "@/lib/arc";
 import { readContract } from "viem/actions";
 import {
@@ -35,6 +36,62 @@ import { cn } from "@/lib/utils";
 interface TraceData {
   ipfsCid: string;
   signature: `0x${string}`;
+}
+
+function decodeTokenId(tokenId: `0x${string}`, chain: string): string {
+  if (chain === "solana") {
+    const hex = tokenId.slice(2);
+    let str = "";
+    for (let i = 0; i < hex.length; i += 2) {
+      const byte = parseInt(hex.slice(i, i + 2), 16);
+      if (byte === 0) break;
+      str += String.fromCharCode(byte);
+    }
+    return str;
+  }
+  return ("0x" + tokenId.slice(-40)) as `0x${string}`;
+}
+
+function useLivePrice(tokenId: `0x${string}`, chain: string) {
+  const [price, setPrice] = useState<number | null>(null);
+
+  useEffect(() => {
+    const id = decodeTokenId(tokenId, chain);
+    if (!id) return;
+    let cancelled = false;
+
+    async function fetch() {
+      try {
+        let p: number | null = null;
+        if (chain === "solana") {
+          const res = await window.fetch(
+            `https://price.jup.ag/v6/price?ids=${id}`
+          );
+          const data = await res.json();
+          p = (data.data?.[id]?.price as number) ?? null;
+        } else {
+          const res = await window.fetch(
+            `https://api.dexscreener.com/latest/dex/tokens/${id}`
+          );
+          const data = await res.json();
+          const pair = data.pairs?.[0];
+          p = pair ? parseFloat(pair.priceUsd as string) : null;
+        }
+        if (!cancelled) setPrice(p);
+      } catch {
+        // silently ignore — stale price stays
+      }
+    }
+
+    fetch();
+    const interval = setInterval(fetch, 60_000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [tokenId, chain]);
+
+  return price;
 }
 
 export default function MarketDetailPage({
@@ -77,6 +134,16 @@ export default function MarketDetailPage({
   const isResolved = market?.state === 1;
   const bettingClosed =
     market && Date.now() / 1000 > Number(market.bettingClosesAt);
+
+  const livePrice = useLivePrice(
+    market?.tokenId ?? ("0x" as `0x${string}`),
+    market?.tokenChain ?? "bsc"
+  );
+  const baselineUsd = market ? Number(market.baselinePrice) / 1e8 : null;
+  const dropPct =
+    livePrice !== null && baselineUsd
+      ? ((baselineUsd - livePrice) / baselineUsd) * 100
+      : null;
 
   return (
     <WalletProvider>
@@ -215,6 +282,37 @@ export default function MarketDetailPage({
                     </span>
                   </div>
                 </div>
+
+                {/* Live price row */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-0.5 p-3 rounded-lg border border-border/60 bg-card">
+                    <span className="text-xs text-muted-foreground">Live Price</span>
+                    <span className="text-sm font-mono font-semibold tabular-nums">
+                      {livePrice !== null
+                        ? `$${livePrice.toLocaleString(undefined, { maximumFractionDigits: 6 })}`
+                        : "—"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-0.5 p-3 rounded-lg border border-border/60 bg-card">
+                    <span className="text-xs text-muted-foreground">Drop from Baseline</span>
+                    <span
+                      className={cn(
+                        "text-sm font-mono font-semibold tabular-nums",
+                        dropPct === null
+                          ? "text-muted-foreground"
+                          : dropPct >= Number(market.thresholdBps) / 100
+                          ? "text-yes"
+                          : dropPct > 0
+                          ? "text-orange-400"
+                          : "text-no"
+                      )}
+                    >
+                      {dropPct === null
+                        ? "—"
+                        : `${dropPct >= 0 ? "-" : "+"}${Math.abs(dropPct).toFixed(1)}%`}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               {/* Odds */}
@@ -240,6 +338,15 @@ export default function MarketDetailPage({
                   size="lg"
                 />
               </div>
+
+              <ErrorBoundary label="CancelRefundPanel">
+                <CancelRefundPanel
+                  market={market}
+                  onStateChange={() => {
+                    getMarketDetail(marketAddress).then(setMarket).catch(() => {});
+                  }}
+                />
+              </ErrorBoundary>
 
               <Separator className="opacity-30" />
 
