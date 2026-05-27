@@ -68,3 +68,4 @@ Faucet: https://faucet.circle.com
 - `/health` endpoint on FastAPI
 - Reconciliation on startup: in-flight rows from prior crash → marked failed
 # retry
+# retry
