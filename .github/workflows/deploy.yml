@@ -44,9 +44,9 @@ jobs:
             git pull origin main
             cd agent
             pip install -e . --quiet
-            sudo systemctl restart agent
+            sudo systemctl restart rugjeez-agent
             sleep 3
-            systemctl is-active --quiet agent && echo "agent: OK" || (echo "agent: FAILED" && sudo journalctl -u agent -n 30 && exit 1)
+            systemctl is-active --quiet rugjeez-agent && echo "agent: OK" || (echo "agent: FAILED" && sudo journalctl -u rugjeez-agent -n 30 && exit 1)
 
   deploy-bot:
     name: Deploy bot
@@ -67,6 +67,6 @@ jobs:
             git pull origin main
             cd bot
             pip install -e . --quiet
-            sudo systemctl restart bot
+            sudo systemctl restart rugjeez-bot
             sleep 3
-            systemctl is-active --quiet bot && echo "bot: OK" || (echo "bot: FAILED" && sudo journalctl -u bot -n 30 && exit 1)
+            systemctl is-active --quiet rugjeez-bot && echo "bot: OK" || (echo "bot: FAILED" && sudo journalctl -u rugjeez-bot -n 30 && exit 1)
