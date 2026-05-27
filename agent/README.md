@@ -69,3 +69,5 @@ Faucet: https://faucet.circle.com
 - Reconciliation on startup: in-flight rows from prior crash → marked failed
 # retry
 # retry
+# retry
+# retry

@@ -56,3 +56,5 @@ Health check: `curl http://localhost:8788/health`
 
 Twitter API v2 write access requires the paid Basic tier (~$100/mo). The stub is in `bot/twitter.py`. Wire up when budget allows.
 # retry
+# retry
+# retry
