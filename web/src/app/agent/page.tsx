@@ -82,7 +82,7 @@ export default function AgentPage() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex items-center gap-3 mt-1 flex-wrap">
               <a
                 href={explorerAddress(AGENT_ADDRESS)}
                 target="_blank"
@@ -92,6 +92,19 @@ export default function AgentPage() {
                 {AGENT_ADDRESS.slice(0, 10)}...{AGENT_ADDRESS.slice(-8)}
                 <ExternalLink className="size-3" />
               </a>
+              {process.env.NEXT_PUBLIC_ERC8004_AGENT_ID && (
+                <a
+                  href={`https://etherscan.io/nft/0x8004A818BFB912233c491871b3d84c89A494BD9e/${process.env.NEXT_PUBLIC_ERC8004_AGENT_ID}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1"
+                >
+                  <Badge variant="secondary" className="gap-1 text-xs font-mono">
+                    ERC-8004 #{process.env.NEXT_PUBLIC_ERC8004_AGENT_ID}
+                    <ExternalLink className="size-2.5" />
+                  </Badge>
+                </a>
+              )}
             </div>
           </div>
 

@@ -52,7 +52,10 @@ export const publicClient = makePublicClient();
 export const wssClient = makeWssClient();
 
 // Block at which MarketRegistry was deployed on Arc Testnet (0x29b1c19).
-export const DEPLOY_BLOCK = 43719705n;
+// Set NEXT_PUBLIC_DEPLOY_BLOCK after any contract redeploy.
+export const DEPLOY_BLOCK = BigInt(
+  process.env.NEXT_PUBLIC_DEPLOY_BLOCK ?? "43719705"
+);
 export const EXPLORER_URL =
   process.env.NEXT_PUBLIC_EXPLORER_URL ?? "https://testnet.arcscan.app";
 

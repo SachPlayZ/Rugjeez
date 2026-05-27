@@ -1,0 +1,18 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004",
+  "name": "Rugjeez Agent",
+  "description": "Autonomous AI rug-pull detection agent. Monitors NFI blacklist and DEX price anomalies, reasons with Groq Qwen3-32B, pins traces to IPFS, and mints binary prediction markets on Arc Testnet.",
+  "image": "https://rugjeez.vercel.app/rugjeez-og-v2.png",
+  "services": [
+    {
+      "type": "health",
+      "url": "https://rugjeez.vercel.app/api/health"
+    },
+    {
+      "type": "stats",
+      "url": "https://rugjeez.vercel.app/api/stats"
+    }
+  ],
+  "supportedTrust": ["crypto-economic"],
+  "registrations": []
+}
