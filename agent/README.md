@@ -67,3 +67,4 @@ Faucet: https://faucet.circle.com
 - structlog JSON logging with `signal_id` propagated through full pipeline
 - `/health` endpoint on FastAPI
 - Reconciliation on startup: in-flight rows from prior crash → marked failed
+# retry
