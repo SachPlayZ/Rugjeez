@@ -8,7 +8,8 @@ import { MarketCard, MarketCardSkeleton } from "@/components/MarketCard";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getAllMarketEvents, type MarketCreatedEvent } from "@/lib/markets";
-import { History } from "lucide-react";
+import { Leaderboard } from "@/components/Leaderboard";
+import { History, Trophy } from "lucide-react";
 
 export default function HistoryPage() {
   const [markets, setMarkets] = useState<MarketCreatedEvent[]>([]);
@@ -45,6 +46,15 @@ export default function HistoryPage() {
                 {markets.length} resolved
               </Badge>
             )}
+          </div>
+
+          {/* Leaderboard */}
+          <div className="mb-10">
+            <div className="flex items-center gap-2 mb-4">
+              <Trophy className="size-4 text-muted-foreground" />
+              <h2 className="font-heading text-base font-semibold">PnL Leaderboard</h2>
+            </div>
+            <Leaderboard />
           </div>
 
           {error && (

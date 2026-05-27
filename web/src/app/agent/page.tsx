@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AGENT_ADDRESS, MARKET_REGISTRY_ADDRESS, TRACE_REGISTRY_ADDRESS } from "@/lib/contracts";
 import { explorerAddress } from "@/lib/arc";
-import { ExternalLink, Bot, Shield, GitBranch, Zap, Database } from "lucide-react";
+import { ExternalLink, Bot, Shield, GitBranch, Zap, Database, Activity } from "lucide-react";
+import { AgentStats } from "@/components/AgentStats";
 
 export const metadata: Metadata = {
   title: "Agent",
@@ -124,7 +125,14 @@ export default function AgentPage() {
             </div>
           </section>
 
-          <Separator className="opacity-30 mb-8" />
+          {/* Live stats */}
+          <div className="flex items-center gap-2 mb-3">
+            <Activity className="size-4 text-muted-foreground" />
+            <h2 className="font-heading text-base font-semibold">Live Stats</h2>
+          </div>
+          <AgentStats />
+
+          <Separator className="opacity-30 my-8" />
 
           {/* Signals */}
           <section className="flex flex-col gap-4 mb-8">

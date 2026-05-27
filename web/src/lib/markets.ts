@@ -349,6 +349,75 @@ export async function getLivePools(
   return result;
 }
 
+export interface LeaderboardEntry {
+  address: `0x${string}`;
+  wagered: bigint;
+  won: bigint;
+  pnl: bigint;
+}
+
+const BET_EVENT = {
+  type: "event",
+  name: "Bet",
+  inputs: [
+    { name: "bettor", type: "address", indexed: true },
+    { name: "yes", type: "bool", indexed: false },
+    { name: "amount", type: "uint256", indexed: false },
+    { name: "shares", type: "uint256", indexed: false },
+  ],
+} as const;
+
+const CLAIMED_EVENT = {
+  type: "event",
+  name: "Claimed",
+  inputs: [
+    { name: "claimant", type: "address", indexed: true },
+    { name: "amount", type: "uint256", indexed: false },
+  ],
+} as const;
+
+export async function fetchLeaderboard(
+  marketAddresses: `0x${string}`[]
+): Promise<LeaderboardEntry[]> {
+  if (marketAddresses.length === 0) return [];
+
+  const wagered = new Map<string, bigint>();
+  const won = new Map<string, bigint>();
+
+  const BATCH = 5;
+  for (let i = 0; i < marketAddresses.length; i += BATCH) {
+    const batch = marketAddresses.slice(i, i + BATCH);
+    await Promise.all(
+      batch.map(async (addr) => {
+        const [betLogs, claimLogs] = await Promise.all([
+          publicClient.getLogs({ address: addr, event: BET_EVENT, fromBlock: DEPLOY_BLOCK }),
+          publicClient.getLogs({ address: addr, event: CLAIMED_EVENT, fromBlock: DEPLOY_BLOCK }),
+        ]);
+        for (const log of betLogs) {
+          const args = log.args as { bettor: `0x${string}`; amount: bigint };
+          const key = args.bettor.toLowerCase();
+          wagered.set(key, (wagered.get(key) ?? 0n) + args.amount);
+        }
+        for (const log of claimLogs) {
+          const args = log.args as { claimant: `0x${string}`; amount: bigint };
+          const key = args.claimant.toLowerCase();
+          won.set(key, (won.get(key) ?? 0n) + args.amount);
+        }
+      })
+    );
+  }
+
+  const allAddrs = new Set([...wagered.keys(), ...won.keys()]);
+  return Array.from(allAddrs)
+    .map((addr) => {
+      const w = wagered.get(addr) ?? 0n;
+      const wi = won.get(addr) ?? 0n;
+      return { address: addr as `0x${string}`, wagered: w, won: wi, pnl: wi - w };
+    })
+    .sort((a, b) => (b.pnl > a.pnl ? 1 : b.pnl < a.pnl ? -1 : 0))
+    .slice(0, 10);
+}
+
 export function watchNewMarkets(
   onMarket: (event: MarketCreatedEvent) => void
 ): () => void {
