@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "agent/**"
+      - "bot/**"
+  pull_request:
+    paths:
+      - "agent/**"
+      - "bot/**"
+
+jobs:
+  lint-agent:
+    name: Lint agent
+    runs-on: ubuntu-latest
+    if: |
+      contains(github.event.head_commit.modified, 'agent/') ||
+      github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install ruff
+      - run: ruff check agent/
+      - run: ruff format --check agent/
+
+  lint-bot:
+    name: Lint bot
+    runs-on: ubuntu-latest
+    if: |
+      contains(github.event.head_commit.modified, 'bot/') ||
+      github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install ruff
+      - run: ruff check bot/
+      - run: ruff format --check bot/
+
+  test-agent:
+    name: Test agent
+    runs-on: ubuntu-latest
+    needs: lint-agent
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e "agent/[dev]"
+      - run: pytest agent/tests/ -x -q
+        continue-on-error: true  # remove once test suite is non-empty

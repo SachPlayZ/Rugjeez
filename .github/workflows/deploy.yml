@@ -1,0 +1,72 @@
+name: Deploy
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "agent/**"
+      - "bot/**"
+
+jobs:
+  changes:
+    name: Detect changed services
+    runs-on: ubuntu-latest
+    outputs:
+      agent: ${{ steps.filter.outputs.agent }}
+      bot: ${{ steps.filter.outputs.bot }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            agent:
+              - 'agent/**'
+            bot:
+              - 'bot/**'
+
+  deploy-agent:
+    name: Deploy agent
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.agent == 'true'
+    environment: production
+    steps:
+      - name: SSH deploy agent
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            cd ~/Rugjeez
+            git pull origin main
+            cd agent
+            pip install -e . --quiet
+            sudo systemctl restart agent
+            sleep 3
+            systemctl is-active --quiet agent && echo "agent: OK" || (echo "agent: FAILED" && sudo journalctl -u agent -n 30 && exit 1)
+
+  deploy-bot:
+    name: Deploy bot
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.bot == 'true'
+    environment: production
+    steps:
+      - name: SSH deploy bot
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            cd ~/Rugjeez
+            git pull origin main
+            cd bot
+            pip install -e . --quiet
+            sudo systemctl restart bot
+            sleep 3
+            systemctl is-active --quiet bot && echo "bot: OK" || (echo "bot: FAILED" && sudo journalctl -u bot -n 30 && exit 1)
